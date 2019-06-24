@@ -1,0 +1,18 @@
+.container {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-content: center;
+}
+
+.linediv {
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    align-content: center;
+}
+
+.bfa {
+    background-color: transparent;
+    border-style: none;
+}
