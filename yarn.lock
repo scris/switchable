@@ -4680,7 +4680,7 @@ lcid@^2.0.0:
   dependencies:
     invert-kv "^2.0.0"
 
-leancloud-realtime-plugin-live-query@^1.1.1:
+leancloud-realtime-plugin-live-query@^1.1.2:
   version "1.1.2"
   resolved "https://registry.npmjs.org/leancloud-realtime-plugin-live-query/-/leancloud-realtime-plugin-live-query-1.1.2.tgz#16c4ba1babe0b907bcf63c4ec85462a0ab349662"
   integrity sha512-p4Z1bVlRE/Xh2z12KIbnlGdKibYJXeO+pKAIPoC81pAWpelKcBzIqzLBjeO8LmChgriWBvEnaHFH2KrH4HVRpQ==
@@ -4701,16 +4701,16 @@ leancloud-realtime@^4.2.0:
     uuid "^3.0.0"
     ws "^5.2.1"
 
-leancloud-storage@3.10.0:
-  version "3.10.0"
-  resolved "https://registry.npmjs.org/leancloud-storage/-/leancloud-storage-3.10.0.tgz#6922ad6f12477a1a23bc114cc328c510873b9260"
-  integrity sha512-7WmMxLg65av4jzQoCAFlBKYlTghUjvbx8PahqvqCioBRbOiQhkroJHAN1GielwahPpZYfQM64OrSRYLxcO00SA==
+leancloud-storage@^3.10.0:
+  version "3.13.2"
+  resolved "https://registry.npmjs.org/leancloud-storage/-/leancloud-storage-3.13.2.tgz#82f1e4f60ef0a1028bd66abe6f9eafb085f7cf55"
+  integrity sha512-VGQv5oExXurtQPLie2ks7nr8Dr5vWHRnVN49z//WiAI+r8Mxk2zat+GM3VRCTCy3L+2UlyQ2rvAm2Zc+3+6BkA==
   dependencies:
     debug "^3.1.0"
     es6-promise "4.2.3"
     eventemitter3 "^2.0.3"
     leancloud-realtime "^4.2.0"
-    leancloud-realtime-plugin-live-query "^1.1.1"
+    leancloud-realtime-plugin-live-query "^1.1.2"
     localstorage-memory "^1.0.1"
     md5 "^2.0.0"
     superagent "^3.3.1"
@@ -8148,6 +8148,11 @@ vue-loader@^15.2.4:
     loader-utils "^1.1.0"
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
+
+vue-loading-overlay@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.npmjs.org/vue-loading-overlay/-/vue-loading-overlay-3.2.0.tgz#7896f195e26a8d915219139a096367c9ad2c3c61"
+  integrity sha512-QBHa+vwcQ3k3oKp4pucP7RHWHSQvgVWFlDFqSaXLu+kCuEv1PZCoerAo1T04enF5y9yMFCqh7L9ChrWHy7HYvA==
 
 vue-router@^3.0.1:
   version "3.0.6"
