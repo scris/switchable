@@ -3,7 +3,6 @@
 </template>
 
 <script>
-import notifier from 'node-notifier';
 export default {
     name: 'notify',
     data() {
@@ -17,11 +16,11 @@ export default {
             var message = obj.message;
             var timeout = 5;
             if(obj.timeout != null) timeout = obj.timeout;
-            notifier.notify({
+            /*notifier.notify({
                 title: title,
                 message: message,
                 timeout: timeout,
-            });
+            });*/
         }
     }
 }
