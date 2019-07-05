@@ -1,0 +1,11 @@
+{
+    "electron": {
+        "mac": {
+            "package": [ "dmg" ],
+            "arch": [ "x64" ]
+        },"windows": {
+            "package": [ "zip" ],
+            "arch": [ "x64" ]
+        }
+    }
+}

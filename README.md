@@ -8,19 +8,17 @@
 # install dependencies
 yarn
 
-# serve with hot reload at localhost:9080, d=dev
-yarn run d
+# build for electron using cordova-electron (mac & win)
+yarn run e
 
-# build electron application for production, m=mac, l=linux, w=win32
-yarn run build
-yarn run m
+# build for android using cordova-android
+yarn run c
+
+# build for web
 yarn run w
-yarn run l
-yarn run build:web
-
 
 ```
 
 ---
 
-This project was generated with [electron-vue](https://github.com/SimulatedGREG/electron-vue).
+This project is using cordova.

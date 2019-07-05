@@ -1,0 +1,5 @@
+{
+  "webPreferences": {
+    "nodeIntegration": true
+  }
+}
