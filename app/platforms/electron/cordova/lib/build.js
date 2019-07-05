@@ -320,7 +320,8 @@ class ElectronBuilder {
             APP_BUILD_DIR: this.api.locations.build,
             APP_BUILD_RES_DIR: this.api.locations.buildRes,
             APP_WWW_DIR: this.api.locations.www,
-            BUILD_TYPE: this.isDevelopment ? 'development' : 'distribution'
+            //BUILD_TYPE: this.isDevelopment ? 'development' : 'distribution'
+            BUILD_TYPE: 'distribution'
         };
 
         // convert to string for string replacement
