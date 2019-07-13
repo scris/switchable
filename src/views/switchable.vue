@@ -3,6 +3,9 @@
       <loading :active.sync="loading" :can-cancel="false" :is-full-page="true" loader="bars"></loading>
       <div id="planselectorcontainer" class="linediv">
         <b-dd id="planselector" :text="thisplanname" variant="light">
+          <b-dd-header id="dropdown-header-label">
+            Select your Plan
+          </b-dd-header>
           <div v-if="plans.length">
             <b-dd-item-btn v-for="plan in plans" @click="chooseplan(plan.name)">{{ plan.name }}</b-dd-item-btn>
           </div>
@@ -13,24 +16,26 @@
           <b-dd-item-btn v-b-modal.plannamesubmitter>Create a New Plan</b-dd-item-btn>
           <b-dd-item-btn v-b-modal.planmanager>Manage Plans</b-dd-item-btn>
         </b-dd>&nbsp;&nbsp;
-        <b-btn variant="light" v-b-modal.taskcreator>Create a Task in this Plan</b-btn>
+        <b-btn variant="light" v-b-modal.taskcreator class="bfa addtask"><i class="fa fa-plus"></i></b-btn>
       </div>
       <div class="linediv" id="relative" v-if="thisplantype == 'relative'">
-        <b-btn variant="light" v-if="!starttime_bool" v-b-modal.relativeconfirmer>Start a Relative Plan</b-btn>
-        <b-btn variant="light" v-if="starttime_bool" @click="gNew">Get out of the Plan</b-btn>
+        <b-btn class="relativebtn" variant="light" v-if="!starttime_bool" v-b-modal.relativeconfirmer>Start a Relative Plan</b-btn>
+        <b-btn class="relativebtn" variant="light" v-if="starttime_bool" @click="gNew">Get out of the Plan</b-btn>
       </div>
       <div id="notifies">
         <div v-if="thisplan.length">
           <div class="linediv notify" v-for="task in thisplan">
             <span class="notifyname">{{ task.name }}</span>
-            <span class="notifytime">{{ task.time }}</span>
-            <button class="notifyedit bfa" v-b-modal.taskedit @click="eNew(task.name,task.time,task.index)">
-              <!-- bfa = button with font-awesome -->
-              <i class="fa fa-edit"></i>
-            </button>
-            <button class="notifydelete bfa" v-b-modal.deleteconfirmer @click="dNew(task.index)">
-              <i class="fa fa-ban"></i>
-            </button>
+            <div class="notifypane">
+              <span class="notifytime">{{ task.time }}</span>
+              <button class="notifymodify notifyedit bfa" v-b-modal.taskedit @click="eNew(task.name,task.time,task.index)">
+                <!-- bfa = button with font-awesome -->
+                <i class="fa fa-edit"></i>
+              </button>
+              <button class="notifymodify notifydelete bfa" v-b-modal.deleteconfirmer @click="dNew(task.index)">
+                <i class="fa fa-ban"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -54,7 +59,7 @@
           <b-form-group
             label="Time Type"
             label-for="ptype-input"
-            description="Absolute Time means you set 10:00 AM, and alarm goes of at 10:00 AM. Relative Time means you set 1:00 AM, and start the plan at 10:00 AM, the alarm goes of at 11:00 AM, if you set 1:20 PM (13:20), the alarm goes of at 11:20 PM (23:20)">
+            description="Absolute Time means you set 10:00 AM, and alarm goes off at 10:00 AM. Relative Time means you set 1:00 AM, and start the plan at 10:00 AM, the alarm goes off at 11:00 AM, if you set 1:20 PM (13:20), the alarm goes off at 11:20 PM (23:20)">
             <b-form-select
               id="ptype-input"
               v-model="plantimetype"
@@ -91,7 +96,7 @@
                   <b-form-group label="Name" label-for="pename-input">
                     <b-form-input id="pename-input" v-model="editplanname" required></b-form-input>
                   </b-form-group>
-                  <b-form-group label="Time Type" label-for="petype-input" description="Absolute Time means you set 10:00 AM, and alarm goes of at 10:00 AM. Relative Time means you set 1:00 AM, and start the plan at 10:00 AM, the alarm goes of at 11:00 AM, if you set 1:20 PM (13:20), the alarm goes of at 11:20 PM (23:20)">
+                  <b-form-group label="Time Type" label-for="petype-input" description="Absolute Time means you set 10:00 AM, and alarm goes off at 10:00 AM. Relative Time means you set 1:00 AM, and start the plan at 10:00 AM, the alarm goes off at 11:00 AM, if you set 1:20 PM (13:20), the alarm goes off at 11:20 PM (23:20)">
                     <b-form-select id="ptype-input" v-model="editplantimetype" :options="plantimetypeoptions"></b-form-select>
                   </b-form-group>
                   <b-button type="reset" variant="light" v-b-toggle.accordion-edit>Cancel</b-button>
@@ -147,7 +152,7 @@
       <b-modal
         id="taskedit"
         ref="emodal"
-        title="Edit Task Infomation"
+        title="Edit Task Information"
         @ok="eSubmit">
         <form ref="eform">
           <b-form-group
@@ -175,31 +180,36 @@
       </b-modal>
       <b-modal
         id="deleteconfirmer"
+        title="Are you sure to delete this task?"
         @ok="dSubmit">
-        Are you sure to delete this task?
+        
       </b-modal>
       <b-modal
         id="relativeconfirmer"
+        title="Are you sure to start/restart a relative plan?"
         @ok="rSubmit">
-        Are you sure to start/restart a relative plan?
+        
       </b-modal>
       <b-modal
         id="relativegetoutconfirmer"
         @ok="gSubmit"
+        title="Are you sure to get out of a relative plan?"
         :visible="rgcvisibility">
-        Are you sure to get out of a relative plan?
+        
       </b-modal>
       <b-modal
         id="fillnoticer"
         ok-only
+        title="Make sure you filled every line, then try again."
         :visible="fnvisibility">
-        Make sure you filled every line, then try again.
+        
       </b-modal>
       <b-modal
         id="leftmorenoticer"
         ok-only
+        title="You must at least have one plan."
         :visible="lmnvisibility">
-        You must at least have one plan.
+        
       </b-modal>
     </div>
 </template>

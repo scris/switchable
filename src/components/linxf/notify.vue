@@ -26,24 +26,13 @@ export default {
                     text: message,
                 });
             } else if (process.env.VUE_APP_LINXF == 'electron') {
-                /*
-                    notifier.notify({
-                        title: title,
-                        message: message,
-                        icon: require("@/assets/notifyicon.png"),
-                        sound: false
-                    }, function (err, res) {
-                        if (err) {
-                            console.log(err)
-                        }
-                    })*/
                 var isWin = (navigator.platform == "Win32") || (navigator.platform == "Win64")|| (navigator.platform == "wow64");   
-                /*if (!isWin) {
+                if (!isWin) {
                     var notification = new Notification(title, {
                         body: message,
                         icon: require("@/assets/notifyicon.png"),
                     });
-                } else {*/
+                } else {
                     const { remote } = window.electron
                     const { BrowserWindow } = remote
                     const path = require('path')
@@ -60,16 +49,12 @@ export default {
                         },
                     });
                     notifyWin.loadURL(window.location.href + 'notifypage');
-                    /*notifyWin.webContents.send('getNotify', {
-                        title: title,
-                        message: message,
-                    });*/
                     notifyWin.on('closed', () => {
                         notifyWin = null
                     });
                     notifyWin.show();
                     notifyWin.focus();
-                //}
+                }
             } else {
                 var notification = new Notification(title, {
                     body: message,
