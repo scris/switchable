@@ -1,10 +1,10 @@
 {
     "browserWindow": {
-        "height": 600,
+        "height": 800,
         "webPreferences":{
             "devTools": false,
             "nodeIntegration": false
         },
-        "width": 800
+        "width": 500
     }
 }

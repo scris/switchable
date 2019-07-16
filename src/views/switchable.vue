@@ -7,22 +7,26 @@
             Select your Plan
           </b-dd-header>
           <div v-if="plans.length">
-            <b-dd-item-btn v-for="plan in plans" @click="chooseplan(plan.name)">{{ plan.name }}</b-dd-item-btn>
+            <b-dd-item-btn class="nohightlight" v-for="plan in plans" @click="chooseplan(plan.name)">{{ plan.name }}</b-dd-item-btn>
           </div>
           <div v-else class="taskpane"> 
             <b-dd-item-btn disabled>Don't have any plans</b-dd-item-btn>
           </div>
           <b-dd-divider></b-dd-divider>
-          <b-dd-item-btn v-b-modal.plannamesubmitter>Create a New Plan</b-dd-item-btn>
-          <b-dd-item-btn v-b-modal.planmanager>Manage Plans</b-dd-item-btn>
+          <b-dd-item-btn class="nohightlight" v-b-modal.plannamesubmitter>Create a New Plan</b-dd-item-btn>
+          <b-dd-item-btn class="nohightlight" v-b-modal.planmanager>Manage Plans</b-dd-item-btn>
         </b-dd>&nbsp;&nbsp;
-        <b-btn variant="light" v-b-modal.taskcreator class="bfa addtask"><i class="fa fa-plus"></i></b-btn>
+        <b-btn variant="light" v-b-modal.taskcreator class="bfa addtask topicon"><i class="fa fa-plus"></i> Task</b-btn>
+        <div class="btn closewindowcontainer" style="-webkit-app-region: no-drag; -webkit-user-select: none">
+          <b-btn variant="light" class="bfa topicon" @on="settings"><i class="fa fa-sliders-h"></i></b-btn>
+          <a v-if="iselectron" class="btn bfa closewindow topicon btn-light" href="javascript:window.close()"><i class="fa fa-times"></i></a>
+        </div>
       </div>
       <div class="linediv" id="relative" v-if="thisplantype == 'relative'">
         <b-btn class="relativebtn" variant="light" v-if="!starttime_bool" v-b-modal.relativeconfirmer>Start a Relative Plan</b-btn>
         <b-btn class="relativebtn" variant="light" v-if="starttime_bool" @click="gNew">Get out of the Plan</b-btn>
       </div>
-      <div id="notifies">
+      <div id="notifies" style="-webkit-app-region: no-drag">
         <div v-if="thisplan.length">
           <div class="linediv notify" v-for="task in thisplan">
             <span class="notifyname">{{ task.name }}</span>
@@ -53,6 +57,7 @@
             <b-form-input
               id="pname-input"
               v-model="planname"
+              placeholder="Enter the Name of the Plan Here"
               required
             ></b-form-input>
           </b-form-group>
@@ -133,6 +138,7 @@
             <b-form-input
               id="tname-input"
               v-model="taskname"
+              placeholder="Enter the Name of the Task Here"
               required
             ></b-form-input>
           </b-form-group>
@@ -275,10 +281,13 @@
         intervalid: 0,
         loading: true,
         lmnvisibility: false,
+        iselectron: false,
       };
     },
     mounted: function() {
-      //this.notifytask("Wow");
+      if(process.env.VUE_APP_LINXF == 'electron') {
+        this.iselectron = true;
+      }
       if(AV.User.current())
       {
         var que = new AV.Query('switchable_plans');
@@ -331,6 +340,9 @@
       clearInterval(this.intervalid);
     },
     methods: {
+      settings() {
+
+      },
       notifytask(title) {
         notify.methods.send({
           title: title,

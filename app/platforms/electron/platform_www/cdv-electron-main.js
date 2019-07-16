@@ -19,7 +19,7 @@
 
 const fs = require('fs');
 // Module to control application life, browser window and tray.
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 // Electron settings from .json file.
 const cdvElectronSettings = require('./cdv-electron-settings.json');
 
@@ -38,11 +38,34 @@ function createWindow () {
         appIcon = `${__dirname}/img/logo.png`;
     }
 
+    if (process.platform === 'darwin') {
+        const template = [
+          {
+            label: "Application",
+            submenu: [
+              { label: "Quit", accelerator: "Command+Q", click: function() { app.quit(); }}
+            ]
+          }, 
+          {
+            label: "Edit",
+            submenu: [
+              { label: "Copy", accelerator: "CmdOrCtrl+C", selector: "copy:" },
+              { label: "Paste", accelerator: "CmdOrCtrl+V", selector: "paste:" },
+            ]
+          }
+        ];
+        Menu.setApplicationMenu(Menu.buildFromTemplate(template))
+    } else {
+        Menu.setApplicationMenu(null)
+    }
+
     const browserWindowOpts = Object.assign({}, cdvElectronSettings.browserWindow, { icon: appIcon }, {
         webPreferences: {
           nodeIntegration: true,
           preload: `${__dirname}/useelectron.js`
-        }
+        },
+        frame: false,
+        resizable: false,
       });
     mainWindow = new BrowserWindow(browserWindowOpts);
 
