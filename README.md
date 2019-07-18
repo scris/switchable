@@ -1,6 +1,7 @@
 # switchable
 
-> Create amount of daily plans, then quickly switch from one to another. 
+> Create amount of daily plans, then quickly switch from one to another.
+> License: MPL v2.0
 
 #### Build Setup
 
@@ -18,7 +19,3 @@ yarn run c
 yarn run w
 
 ```
-
----
-
-This project is using cordova.
