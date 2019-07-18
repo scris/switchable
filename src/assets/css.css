@@ -55,6 +55,10 @@ body {
     padding: 0px 0px 0px 0px;
 }
 
+button {
+    letter-spacing: 0.1rem !important;
+}
+
 .btn,.btn-secondary,.btn.secondary:hover,.btn-primary,.btn.primarey:hover,.btn-light,.btn-light:hover {
     background-color: transparent;
     color: black;
@@ -250,6 +254,8 @@ select {
     text-decoration: none !important;
     -webkit-tap-highlight-color: #fdfdfd !important;
     box-shadow: 0 0 0 0.2rem #fdfdfd !important;
+    font-weight: 500;
+    color: #696e74;
 }
 
 option {
@@ -267,6 +273,7 @@ option {
 
 .dropdown-item {
     padding-left: 0rem;
+    font-weight: 400;
 }
 
 .dropdown-item:hover {
@@ -287,6 +294,10 @@ option {
 
 .dropdown-toggle {
     padding: 0.375rem 0.75rem 0.375rem 0;
+}
+
+.bold .dropdown-item {
+    font-weight: 500 !important;
 }
 
 ::-webkit-scrollbar-track

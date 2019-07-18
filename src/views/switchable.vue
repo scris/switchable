@@ -13,12 +13,12 @@
             <b-dd-item-btn disabled>Don't have any plans</b-dd-item-btn>
           </div>
           <b-dd-divider></b-dd-divider>
-          <b-dd-item-btn class="nohightlight" v-b-modal.plannamesubmitter>Create a New Plan</b-dd-item-btn>
-          <b-dd-item-btn class="nohightlight" v-b-modal.planmanager>Manage Plans</b-dd-item-btn>
+          <b-dd-item-btn class="nohightlight bold" v-b-modal.plannamesubmitter>Create a New Plan</b-dd-item-btn>
+          <b-dd-item-btn class="nohightlight bold" v-b-modal.planmanager>Manage Plans</b-dd-item-btn>
         </b-dd>&nbsp;&nbsp;
         <b-btn variant="light" v-b-modal.taskcreator class="bfa addtask topicon"><i class="fa fa-plus"></i> Task</b-btn>
         <div class="btn closewindowcontainer" style="-webkit-app-region: no-drag; -webkit-user-select: none">
-          <b-btn variant="light" class="bfa topicon" @on="settings"><i class="fa fa-sliders-h"></i></b-btn>
+          <b-btn variant="light" class="bfa topicon" @click="settings"><i class="fa fa-sliders-h"></i></b-btn>
           <a v-if="iselectron" class="btn bfa closewindow topicon btn-light" href="javascript:window.close()"><i class="fa fa-times"></i></a>
         </div>
       </div>
@@ -28,7 +28,7 @@
       </div>
       <div id="notifies" style="-webkit-app-region: no-drag">
         <div v-if="thisplan.length">
-          <div class="linediv notify" v-for="task in thisplan">
+          <div class="linediv notify" v-for="task in thisplan" :key="task.id">
             <span class="notifyname">{{ task.name }}</span>
             <div class="notifypane">
               <span class="notifytime">{{ task.time }}</span>
@@ -88,7 +88,7 @@
         ok-only
         :no-enforce-focus="true">
         <b-list-group v-if="plans.length">
-          <b-list-group-item button v-for="plan in plans" @click="planModify(plan.name)">{{ plan.name }}</b-list-group-item>
+          <b-list-group-item button v-for="plan in plans" :key="plan.id" @click="planModify(plan.name)">{{ plan.name }}</b-list-group-item>
         </b-list-group>
         <div v-if="pmbvisibility">
           <b-card no-body class="mb-1">
@@ -341,7 +341,7 @@
     },
     methods: {
       settings() {
-
+        alert("Switchable 0.1.0 (1)\nSettings are temporarily unavailable");
       },
       notifytask(title) {
         notify.methods.send({
