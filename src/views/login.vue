@@ -85,12 +85,16 @@ export default {
 
 <script>
 import AV from 'leancloud-storage';
-var APP_ID = 'C7SVWNehvavYoUH5cssIKYDH-MdYXbMMI';
-var APP_KEY = 'nJ2QMhw8deT5QwNt40rjsaK7';
+var apijson = require("@/assets/leancloud.json")
+var y364rdef43id = apijson.u5dfsg53452hfc43cdid;
+var t43refwdskey = apijson.f653fdsh453refdslkey;
+var ht5grfvfr5re = '';
+if (apijson.du23453dcxe4trefsdre == "yes") ht5grfvfr5re = 'us';
+else ht5grfvfr5re = '';
 AV.init({
-	appId: APP_ID,
-	appKey: APP_KEY,
-	region: 'us'
+	appId: y364rdef43id,
+	appKey: t43refwdskey,
+	region: ht5grfvfr5re,
 });
 
 export default {

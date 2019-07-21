@@ -331,3 +331,14 @@ option {
 {
 	background-color: #50505020;
 }
+
+#settingspanel {
+    justify-content: flex-start;
+    flex-direction: column;
+    align-content: center;
+}
+
+.abouttext {
+    position: relative;
+    top: 100%;
+}

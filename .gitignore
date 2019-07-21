@@ -22,10 +22,5 @@ yarn-error.log*
 
 thumbs.db
 !.gitkeep
-
-/app/platforms/browser
-/app/platforms/android
-/app/platforms/electron/build
-/app/platforms/electron/www
-/app/www
-/app/plugins
+/www
+src/assets/leancloud.json

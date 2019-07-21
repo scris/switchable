@@ -11,21 +11,6 @@ import BootstrapVue from 'bootstrap-vue'
 Vue.use(BootstrapVue)
 
 Vue.config.productionTip = false
-Vue.config.errorHandler = (err, vm, info) => {
-  console.error('Vue Error Handler:\n'+error+'\n'+vm+'\n'+info+'\n');
-}
-
-import VueCordova from 'vue-cordova' 
-Vue.use(VueCordova) 
-if (window.location.protocol === 'file:' || window.location.port === '3000') {
-  var cordovaScript = document.createElement('script') 
-  cordovaScript.setAttribute('type', 'text/javascript') 
-  cordovaScript.setAttribute('src', 'cordova.js') 
-  document.body.appendChild(cordovaScript) 
-} 
-Vue.cordova.on('deviceready', () => {
-  
-});
 
 new Vue({
   router,

@@ -7,7 +7,7 @@
             Select your Plan
           </b-dd-header>
           <div v-if="plans.length">
-            <b-dd-item-btn class="nohightlight" v-for="plan in plans" @click="chooseplan(plan.name)">{{ plan.name }}</b-dd-item-btn>
+            <b-dd-item-btn class="nohightlight" v-for="plan in plans" @click="chooseplan(plan.name)" :key="plan.id">{{ plan.name }}</b-dd-item-btn>
           </div>
           <div v-else class="taskpane"> 
             <b-dd-item-btn disabled>Don't have any plans</b-dd-item-btn>
@@ -18,7 +18,7 @@
         </b-dd>&nbsp;&nbsp;
         <b-btn variant="light" v-b-modal.taskcreator class="bfa addtask topicon"><i class="fa fa-plus"></i> Task</b-btn>
         <div class="btn closewindowcontainer" style="-webkit-app-region: no-drag; -webkit-user-select: none">
-          <b-btn variant="light" class="bfa topicon" @click="settings"><i class="fa fa-sliders-h"></i></b-btn>
+          <b-btn variant="light" class="bfa topicon" v-b-modal.settingspanel><i class="fa fa-sliders-h"></i></b-btn>
           <a v-if="iselectron" class="btn bfa closewindow topicon btn-light" href="javascript:window.close()"><i class="fa fa-times"></i></a>
         </div>
       </div>
@@ -45,7 +45,6 @@
       </div>
       <b-modal
         id="plannamesubmitter"
-        ref="pmodal"
         title="Submit Plan Name"
         @ok="pSubmit"
         @show="pNew">
@@ -75,11 +74,9 @@
       </b-modal>
       <b-modal
         id="plannameedit"
-        ref="pemodal"
         title="Edit Plan"
         @ok="peSubmit"
         @show="peNew">
-
       </b-modal>
       <b-modal
         id="planmanager"
@@ -188,34 +185,38 @@
         id="deleteconfirmer"
         title="Are you sure to delete this task?"
         @ok="dSubmit">
-        
       </b-modal>
       <b-modal
         id="relativeconfirmer"
         title="Are you sure to start/restart a relative plan?"
         @ok="rSubmit">
-        
       </b-modal>
       <b-modal
         id="relativegetoutconfirmer"
         @ok="gSubmit"
         title="Are you sure to get out of a relative plan?"
         :visible="rgcvisibility">
-        
       </b-modal>
       <b-modal
         id="fillnoticer"
         ok-only
         title="Make sure you filled every line, then try again."
         :visible="fnvisibility">
-        
       </b-modal>
       <b-modal
         id="leftmorenoticer"
         ok-only
         title="You must at least have one plan."
-        :visible="lmnvisibility">
-        
+        :visible="lmnvisibility">      
+      </b-modal>
+      <b-modal
+        id="settingspanel"
+        ok-only
+        title="Settings"
+        ref="smodal"
+        :visible="settingsvisibility">
+        <b-btn @click="logout">Log Out</b-btn>
+        <small class="form-text text-muted abouttext">Scris Switchable Pre-Release 0.2.0 (4)</small>
       </b-modal>
     </div>
 </template>
@@ -237,6 +238,8 @@
     },
     data() {
       return {
+        packageno: '0.2.0',
+        buildno: '4',
         time: '00:00',
         thisplan: [],
         i_thisplan: 0,
@@ -274,13 +277,14 @@
         rgcvisibility: false,
         //modal.planmanager.planmodifyboard
         pmbvisibility: false,
+        lmnvisibility: false,
+        settingsvisibility: false,
         editplanname: '',
         editplantimetype: '',
         i_editplan: '',
         //modal end
         intervalid: 0,
         loading: true,
-        lmnvisibility: false,
         iselectron: false,
       };
     },
@@ -340,8 +344,13 @@
       clearInterval(this.intervalid);
     },
     methods: {
-      settings() {
-        alert("Switchable 0.1.0 (1)\nSettings are temporarily unavailable");
+      logout() {
+        var that = this;
+        AV.User.logOut().then(function (user) {
+          that.$router.push('/login');
+        }, function (error) {
+          console.error(error);
+        });
       },
       notifytask(title) {
         notify.methods.send({

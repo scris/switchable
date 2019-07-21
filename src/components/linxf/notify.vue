@@ -20,7 +20,7 @@ export default {
             var message = obj.message;
             var timeout = 5;
             if(obj.timeout != null) timeout = obj.timeout;
-            if (process.env.VUE_APP_LINXF == 'cordova') {
+            if (process.env.VUE_APP_LINXF == 'capacitor') {
                 cordova.plugins.notification.local.schedule({
                     title: title,
                     text: message,
