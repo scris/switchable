@@ -333,12 +333,31 @@ option {
 }
 
 #settingspanel {
+    display: flex;
     justify-content: flex-start;
     flex-direction: column;
     align-content: center;
 }
 
-.abouttext {
-    position: relative;
-    top: 100%;
+.settingsfooter {
+    width: 80vw;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+    align-items: center;
+    align-content: center;
+}
+
+#abouttext {
+    flex-grow: 1;
+}
+
+::selection {
+    color: darkred;
+    background-color: rgba(136, 15, 15, 0.205);
+    text-shadow: none;
+}
+
+li {
+    list-style: none;
 }

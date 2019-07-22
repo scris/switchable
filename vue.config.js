@@ -1,5 +1,6 @@
 const path = require('path')
 const UglifyPlugin = require('uglifyjs-webpack-plugin')
+process.env.VUE_APP_VER = require('./package.json').version
 module.exports = {
 	publicPath: './',
     outputDir: 'www',
@@ -40,4 +41,13 @@ module.exports = {
             })
         }   
     },
+    chainWebpack: config => {
+        config.module
+          .rule("i18n")
+          .resourceQuery(/blockType=i18n/)
+          .type('javascript/auto')
+          .use("i18n")
+            .loader("@kazupon/vue-i18n-loader")
+            .end();
+    }
 }

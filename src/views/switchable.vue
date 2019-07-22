@@ -1,30 +1,31 @@
+<i18n src="@/assets/lang.json"></i18n>
 <template>
     <div class="container">
       <loading :active.sync="loading" :can-cancel="false" :is-full-page="true" loader="bars"></loading>
       <div id="planselectorcontainer" class="linediv">
         <b-dd id="planselector" :text="thisplanname" variant="light">
           <b-dd-header id="dropdown-header-label">
-            Select your Plan
+            {{ $t('selectplan') }}
           </b-dd-header>
           <div v-if="plans.length">
             <b-dd-item-btn class="nohightlight" v-for="plan in plans" @click="chooseplan(plan.name)" :key="plan.id">{{ plan.name }}</b-dd-item-btn>
           </div>
           <div v-else class="taskpane"> 
-            <b-dd-item-btn disabled>Don't have any plans</b-dd-item-btn>
+            <b-dd-item-btn disabled>{{ $t('donthaveplan') }}</b-dd-item-btn>
           </div>
           <b-dd-divider></b-dd-divider>
-          <b-dd-item-btn class="nohightlight bold" v-b-modal.plannamesubmitter>Create a New Plan</b-dd-item-btn>
-          <b-dd-item-btn class="nohightlight bold" v-b-modal.planmanager>Manage Plans</b-dd-item-btn>
+          <b-dd-item-btn class="nohightlight bold" v-b-modal.plannamesubmitter>{{ $t('createplan') }}</b-dd-item-btn>
+          <b-dd-item-btn class="nohightlight bold" v-b-modal.planmanager>{{ $t('manageplan') }}</b-dd-item-btn>
         </b-dd>&nbsp;&nbsp;
-        <b-btn variant="light" v-b-modal.taskcreator class="bfa addtask topicon"><i class="fa fa-plus"></i> Task</b-btn>
+        <b-btn variant="light" v-b-modal.taskcreator class="bfa addtask topicon"><i class="fa fa-plus"></i> {{ $t('tasktext') }}</b-btn>
         <div class="btn closewindowcontainer" style="-webkit-app-region: no-drag; -webkit-user-select: none">
           <b-btn variant="light" class="bfa topicon" v-b-modal.settingspanel><i class="fa fa-sliders-h"></i></b-btn>
           <a v-if="iselectron" class="btn bfa closewindow topicon btn-light" href="javascript:window.close()"><i class="fa fa-times"></i></a>
         </div>
       </div>
       <div class="linediv" id="relative" v-if="thisplantype == 'relative'">
-        <b-btn class="relativebtn" variant="light" v-if="!starttime_bool" v-b-modal.relativeconfirmer>Start a Relative Plan</b-btn>
-        <b-btn class="relativebtn" variant="light" v-if="starttime_bool" @click="gNew">Get out of the Plan</b-btn>
+        <b-btn class="relativebtn" variant="light" v-if="!starttime_bool" v-b-modal.relativeconfirmer>{{ $t('startrplan') }}</b-btn>
+        <b-btn class="relativebtn" variant="light" v-if="starttime_bool" @click="gNew">{{ $t('outrplan') }}</b-btn>
       </div>
       <div id="notifies" style="-webkit-app-region: no-drag">
         <div v-if="thisplan.length">
@@ -45,25 +46,28 @@
       </div>
       <b-modal
         id="plannamesubmitter"
-        title="Submit Plan Name"
+        :title="$t('ptitle')"
+        ref="pmodal"
+        @show="pNew"
         @ok="pSubmit"
-        @show="pNew">
+        :ok-title="$t('submit')"
+        :cancel-title="$t('cancel')">
         <form ref="pform">
           <b-form-group
-            label="Name"
+            :label="$t('pname')"
             label-for="pname-input"
           >
             <b-form-input
               id="pname-input"
               v-model="planname"
-              placeholder="Enter the Name of the Plan Here"
+              :placeholder="$t('pplanname')"
               required
             ></b-form-input>
           </b-form-group>
           <b-form-group
-            label="Time Type"
+            :label="$t('ptimetype')"
             label-for="ptype-input"
-            description="Absolute Time means you set 10:00 AM, and alarm goes off at 10:00 AM. Relative Time means you set 1:00 AM, and start the plan at 10:00 AM, the alarm goes off at 11:00 AM, if you set 1:20 PM (13:20), the alarm goes off at 11:20 PM (23:20)">
+            :description="$t('timetypedescription')">
             <b-form-select
               id="ptype-input"
               v-model="plantimetype"
@@ -73,49 +77,44 @@
         </form>
       </b-modal>
       <b-modal
-        id="plannameedit"
-        title="Edit Plan"
-        @ok="peSubmit"
-        @show="peNew">
-      </b-modal>
-      <b-modal
         id="planmanager"
         ref="mmodal"
-        title="Select a Plan and Make Modifications"
+        :title="$t('petitle')"
         ok-only
-        :no-enforce-focus="true">
+        :no-enforce-focus="true"
+        :ok-title="$t('close')">
         <b-list-group v-if="plans.length">
           <b-list-group-item button v-for="plan in plans" :key="plan.id" @click="planModify(plan.name)">{{ plan.name }}</b-list-group-item>
         </b-list-group>
         <div v-if="pmbvisibility">
           <b-card no-body class="mb-1">
             <b-card-header header-tag="header" role="tab" class="p-1">
-              <b-button block href="#" v-b-toggle.accordion-edit variant="light" @click="peNew">Edit</b-button>
+              <b-button block href="#" v-b-toggle.accordion-edit variant="light" @click="peNew">{{ $t('peedit') }} {{ editplanname }}</b-button>
             </b-card-header>
             <b-collapse id="accordion-edit" accordion="pmb-accordion" role="tabpanel">
               <b-card-body>
                 <form ref="peform" @submit="peSubmit" @reset="peNew">
-                  <b-form-group label="Name" label-for="pename-input">
+                  <b-form-group :label="$t('pname')" label-for="pename-input">
                     <b-form-input id="pename-input" v-model="editplanname" required></b-form-input>
                   </b-form-group>
-                  <b-form-group label="Time Type" label-for="petype-input" description="Absolute Time means you set 10:00 AM, and alarm goes off at 10:00 AM. Relative Time means you set 1:00 AM, and start the plan at 10:00 AM, the alarm goes off at 11:00 AM, if you set 1:20 PM (13:20), the alarm goes off at 11:20 PM (23:20)">
+                  <b-form-group :label="$t('ptimetype')" label-for="petype-input" :description="$t('timetypedescription')">
                     <b-form-select id="ptype-input" v-model="editplantimetype" :options="plantimetypeoptions"></b-form-select>
                   </b-form-group>
-                  <b-button type="reset" variant="light" v-b-toggle.accordion-edit>Cancel</b-button>
-                  <b-button type="submit" variant="light" v-b-toggle.accordion-edit>OK</b-button>
+                  <b-button type="reset" variant="light" v-b-toggle.accordion-edit>{{ $t('cancel') }}</b-button>
+                  <b-button type="submit" variant="light" v-b-toggle.accordion-edit>{{ $t('submit') }}</b-button>
                 </form>
               </b-card-body>
             </b-collapse>
           </b-card>
           <b-card no-body class="mb-1">
             <b-card-header header-tag="header" role="tab" class="p-1">
-              <b-button block href="#" v-b-toggle.accordion-delete variant="light" @click="peNew">Delete</b-button>
+              <b-button block href="#" v-b-toggle.accordion-delete variant="light" @click="peNew">{{ $t('pedelete') }} {{ editplanname }}</b-button>
             </b-card-header>
             <b-collapse id="accordion-delete" accordion="pmb-accordion" role="tabpanel">
               <b-card-body>
-                <b-card-text>Are you sure to delete this plan? All the tasks in the plan will vanish.</b-card-text>
-                <b-button variant="light" v-b-toggle.accordion-delete>Cancel</b-button>
-                <b-button variant="light" v-b-toggle.accordion-delete @click="pdSubmit">OK</b-button>
+                <b-card-text>{{ $t('pedeletecheck') }}</b-card-text>
+                <b-button variant="light" v-b-toggle.accordion-delete>{{ $t('cancel') }}</b-button>
+                <b-button variant="light" v-b-toggle.accordion-delete @click="pdSubmit">{{ $t('submit') }}</b-button>
               </b-card-body>
             </b-collapse>
           </b-card>
@@ -124,23 +123,25 @@
       <b-modal
         id="taskcreator"
         ref="tmodal"
-        title="Submit Task Information"
+        :title="$t('ttitle')"
         @ok="tSubmit"
-        @show="tNew">
+        @show="tNew"
+        :ok-title="$t('submit')"
+        :cancel-title="$t('cancel')">
         <form ref="tform">
           <b-form-group
-            label="Name"
+            :label="$t('tname')"
             label-for="tname-input"
           >
             <b-form-input
               id="tname-input"
               v-model="taskname"
-              placeholder="Enter the Name of the Task Here"
+              :placeholder="$t('ttaskname')"
               required
             ></b-form-input>
           </b-form-group>
           <b-form-group
-            label="Time"
+            :label="$t('ttime')"
             label-for="time-input"
           >
             <b-form-input
@@ -155,11 +156,13 @@
       <b-modal
         id="taskedit"
         ref="emodal"
-        title="Edit Task Information"
-        @ok="eSubmit">
+        :title="$t('etitle')"
+        @ok="eSubmit"
+        :ok-title="$t('submit')"
+        :cancel-title="$t('cancel')">
         <form ref="eform">
           <b-form-group
-            label="Name"
+            :label="$t('tname')"
             label-for="ename-input"
           >
             <b-form-input
@@ -169,7 +172,7 @@
             ></b-form-input>
           </b-form-group>
           <b-form-group
-            label="Time"
+            :label="$t('ttime')"
             label-for="time-input"
           >
             <b-form-input
@@ -183,40 +186,68 @@
       </b-modal>
       <b-modal
         id="deleteconfirmer"
-        title="Are you sure to delete this task?"
-        @ok="dSubmit">
+        :title="$t('confirm')"
+        ref="dcmodal"
+        :ok-title="$t('submit')"
+        :cancel-title="$t('cancel')"
+        @ok="dSubmit"> 
+        {{ $t('dctext') }}
       </b-modal>
       <b-modal
         id="relativeconfirmer"
-        title="Are you sure to start/restart a relative plan?"
-        @ok="rSubmit">
+        :title="$t('confirm')"
+        ref="rcmodal"
+        :ok-title="$t('submit')"
+        @ok="rSubmit"> 
+        {{ $t('rctext') }}
       </b-modal>
       <b-modal
         id="relativegetoutconfirmer"
         @ok="gSubmit"
-        title="Are you sure to get out of a relative plan?"
-        :visible="rgcvisibility">
+        :title="$t('confirm')"
+        ref="rgcmodal"
+        :ok-title="$t('submit')">
+        {{ $t('rgctext') }}
       </b-modal>
       <b-modal
         id="fillnoticer"
         ok-only
-        title="Make sure you filled every line, then try again."
-        :visible="fnvisibility">
+        :title="$t('confirm')"
+        ref="fnmodal"
+        :ok-title="$t('submit')">
+        {{ $t('fntext') }}
       </b-modal>
       <b-modal
         id="leftmorenoticer"
         ok-only
-        title="You must at least have one plan."
-        :visible="lmnvisibility">      
+        :title="$t('confirm')"
+        ref="lmnmodal"
+        :ok-title="$t('submit')">  
+        {{ $t('lmntext') }} 
+      </b-modal>
+      <b-modal
+        id="loggingoutconfirmer"
+        ok-only
+        @ok="logout"
+        :title="$t('confirm')"
+        ref="locmodal"
+        :ok-title="$t('submit')">  
+        {{ $t('loctext') }}
       </b-modal>
       <b-modal
         id="settingspanel"
         ok-only
-        title="Settings"
-        ref="smodal"
-        :visible="settingsvisibility">
-        <b-btn @click="logout">Log Out</b-btn>
-        <small class="form-text text-muted abouttext">Scris Switchable Pre-Release 0.2.0 (4)</small>
+        :title="$t('stitle')"
+        ref="smodal">
+        <li><b-btn v-b-modal.loggingoutconfirmer>{{ $t('slogout') }}</b-btn></li>
+        <li><b-btn @click="i18nchinese">中文</b-btn>
+        <b-btn @click="i18nenglish">English</b-btn></li>
+        <div slot="modal-footer">
+          <div class="settingsfooter">
+            <small class="form-text text-muted" id="abouttext">{{ $t('sabout') }} {{ version }}</small>
+            <b-button varient="primary" @click="$refs['smodal'].hide()">{{ $t('close') }}</b-button>
+          </div>
+        </div>
       </b-modal>
     </div>
 </template>
@@ -226,6 +257,8 @@
   import notify from '@/components/linxf/notify';
   import Loading from 'vue-loading-overlay';
   import 'vue-loading-overlay/dist/vue-loading.css';
+  import { Plugins } from '@capacitor/core';
+  const { Storage } = Plugins;
   //import VueTimepicker from 'vue2-timepicker'
   var Plan = AV.Object.extend('switchable_plans');
   var alarm = new Audio();
@@ -254,8 +287,8 @@
         planname: '',
         plantimetype: 'absolute',
         plantimetypeoptions: [
-          { value: 'absolute', text: 'Absolute Time' },
-          { value: 'relative', text: 'Relative Time' },
+          { value: 'absolute', text: this.$t('absolutetime') },
+          { value: 'relative', text: this.$t('relativetime') },
         ],
         taskname: '',
         tasktime: '00:00',
@@ -271,13 +304,8 @@
         },
         edittaskindex: 1,
         i_deletetask: 1,
-        //modal.fillnoticer
-        fnvisibility: false,
-        //modal.relativegetoutconfirmer
-        rgcvisibility: false,
         //modal.planmanager.planmodifyboard
         pmbvisibility: false,
-        lmnvisibility: false,
         settingsvisibility: false,
         editplanname: '',
         editplantimetype: '',
@@ -286,9 +314,23 @@
         intervalid: 0,
         loading: true,
         iselectron: false,
+        lang: 'en',
+        version: '1.0.0',
       };
     },
+    watch: {
+      async lang (val) {
+        this.storagesetlang(val);
+        this.$i18n.locale = val;
+        this.plantimetypeoptions = [
+          { value: 'absolute', text: this.$t('absolutetime') },
+          { value: 'relative', text: this.$t('relativetime') },
+        ];
+      }
+    },
     mounted: function() {
+      this.version = process.env.VUE_APP_VER;
+      this.i18nsetlang();
       if(process.env.VUE_APP_LINXF == 'electron') {
         this.iselectron = true;
       }
@@ -352,6 +394,24 @@
           console.error(error);
         });
       },
+      async storagesetlang(val) {
+        await Storage.set({
+          key: 'lang',
+          value: val
+        });
+      },
+      async i18nsetlang() {
+        const retlang = await Storage.get({ key:'lang' });
+        if(retlang.value != null) this.lang = retlang.value;
+        else this.lang = 'en';
+        this.$i18n.locale = retlang.value;
+      },
+      i18nchinese() {
+        this.lang = 'cn';
+      },
+      i18nenglish() {
+        this.lang = 'en';
+      },
       notifytask(title) {
         notify.methods.send({
           title: title,
@@ -392,7 +452,7 @@
         }
         else
         {
-          this.fnvisibility = true;
+          this.$refs['fnmodal'].show();
         }
       },
       tNew() {
@@ -430,7 +490,7 @@
         }
         else
         {
-          this.fnvisibility = true;
+          this.$refs['fnmodal'].show();
         }
       },
       pNew() {
@@ -456,7 +516,7 @@
         }
         else
         {
-          this.fnvisibility = true;
+          this.$refs['fnmodal'].show();
         }
         this.loading = false;
       },
@@ -486,7 +546,7 @@
         else
         {
           this.loading = false;
-          this.fnvisibility = true;
+          this.$refs['fnmodal'].show();
         }
       },
       eNew(ename,etime,eindex) {
@@ -520,7 +580,7 @@
           var that = this;
           deleteplan.destroy().then(function (success) {
             that.plans = that.plans.filter(dplan => {
-              return dplan.name !== that.editplanname;
+              return dplan.id !== that.editplanid;
             });
             if(that.i_editplan == that.i_thisplan) {
               that.thisplan = that.plans[0].tasks;
@@ -531,11 +591,12 @@
             } else {
               chooseplan(that.thisplanname, that.starttime_bool);
             }
+            that.pmbvisibility = false;
           }, function (error) {
             console.error(error);
           });
         } else {
-          this.lmnvisibility = true;
+          this.$refs['lmnmodal'].show();
         }
         this.loading = false;
       },
@@ -550,12 +611,12 @@
       //g = get out of a started relative-time plan
       //modal(g) start
       gNew() {
-        this.rgcvisibility = true;
+        this.$refs['rgcmodal'].show();
       },
       gSubmit() {
         this.starttime = new Date();
         this.starttime_bool = false;
-        this.rgcvisibility = false;
+        this.$refs['rgcmodal'].hide();
       },
       //modal(g) end
       taskUpdater() {
@@ -576,6 +637,7 @@
             this.pmbvisibility = true;
             this.i_editplan = index;
             this.editplanname = item.name;
+            this.editplanid = item.id;
             this.editplantimetype = item.type;
           }
         })
