@@ -66,13 +66,13 @@
           </b-form-group>
           <b-form-group
             :label="$t('ptimetype')"
-            label-for="ptype-input"
-            :description="$t('timetypedescription')">
+            label-for="ptype-input">
             <b-form-select
               id="ptype-input"
               v-model="plantimetype"
               :options="plantimetypeoptions"
             ></b-form-select>
+            <b-tooltip target="ptype-input" varient="light">{{ $t('timetypedescription') }}</b-tooltip>
           </b-form-group>
         </form>
       </b-modal>
@@ -97,8 +97,9 @@
                   <b-form-group :label="$t('pname')" label-for="pename-input">
                     <b-form-input id="pename-input" v-model="editplanname" required></b-form-input>
                   </b-form-group>
-                  <b-form-group :label="$t('ptimetype')" label-for="petype-input" :description="$t('timetypedescription')">
+                  <b-form-group :label="$t('ptimetype')" label-for="petype-input">
                     <b-form-select id="ptype-input" v-model="editplantimetype" :options="plantimetypeoptions"></b-form-select>
+                    <b-tooltip target="ptype-input" varient="light">{{ $t('timetypedescription') }}</b-tooltip>
                   </b-form-group>
                   <b-button type="reset" variant="light" v-b-toggle.accordion-edit>{{ $t('cancel') }}</b-button>
                   <b-button type="submit" variant="light" v-b-toggle.accordion-edit>{{ $t('submit') }}</b-button>
