@@ -1,7 +1,7 @@
 body {
     background-color: #fdfdfd; 
     font-weight: 500;
-    letter-spacing: 0.1rem;
+    letter-spacing: 0.15rem;
     font-size: medium;
     text-transform: uppercase;
     font-family: -apple-system, "Noto Sans", "Helvetica Neue", Helvetica, "Nimbus Sans L", Arial, "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif; 
@@ -56,7 +56,7 @@ body {
 }
 
 button {
-    letter-spacing: 0.1rem !important;
+    letter-spacing: 0.15rem !important;
 }
 
 .btn,.btn-secondary,.btn.secondary:hover,.btn-primary,.btn.primarey:hover,.btn-light,.btn-light:hover {
@@ -82,7 +82,7 @@ button {
 }
 
 .notifyname {
-    letter-spacing: 0.1rem;
+    letter-spacing: 0.15rem;
 }
 
 .notifytime {
@@ -169,13 +169,13 @@ select {
 .form-control {
     font-weight: 500;
     line-height: 1.5;
-    letter-spacing: 0.1rem;
+    letter-spacing: 0.15rem;
     text-transform: uppercase;
     color: #696e74;
     background-color: transparent;
     padding-left: 0;
     border: none;
-    border-radius: 0.1rem;
+    border-radius: 0.15rem;
     -webkit-app-region: no-drag !important;
 }
 
@@ -360,4 +360,14 @@ option {
 
 li {
     list-style: none;
+}
+
+small.once {
+    font-weight: 500;
+    letter-spacing: 0.15rem;
+    text-transform: uppercase;
+}
+
+.finishedoncetask {
+    color: grey;
 }

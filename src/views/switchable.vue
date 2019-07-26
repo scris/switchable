@@ -28,9 +28,26 @@
         <b-btn class="relativebtn" variant="light" v-if="starttime_bool" @click="gNew">{{ $t('outrplan') }}</b-btn>
       </div>
       <div id="notifies" style="-webkit-app-region: no-drag">
+        <div v-if="oncetask.length">
+          <div class="linediv notify" v-for="task in oncetask" :key="task.id">
+            <div class="notifypane"><span class="notifyname" v-bind:class="{ finishedoncetask: task.finished }">{{ task.name }}</span>&nbsp;<small class="text-muted once" v-if="!task.finished">{{ $t('tonce') }}</small><small class="text-muted once" v-if="task.finished">{{ $t('finishedoncetask') }}</small></div>
+            <div class="notifypane">
+              <span class="notifytime" v-bind:class="{ finishedoncetask: task.finished }">{{ task.time }}</span>
+              <button class="notifymodify notifyedit bfa"  v-bind:class="{ finishedoncetask: task.finished }" v-b-modal.taskedit @click="eNew(task.name,task.time,task.index)">
+                <!-- bfa = button with font-awesome -->
+                <i class="fa fa-edit"></i>
+              </button>
+              <button class="notifymodify notifydelete bfa" v-bind:class="{ finishedoncetask: task.finished }" v-b-modal.deleteconfirmer @click="dNew(task.index)">
+                <i class="fa fa-ban"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="notifies" style="-webkit-app-region: no-drag">
         <div v-if="thisplan.length">
           <div class="linediv notify" v-for="task in thisplan" :key="task.id">
-            <span class="notifyname">{{ task.name }}</span>
+            <div class="notifypane"><span class="notifyname">{{ task.name }}</span></div>
             <div class="notifypane">
               <span class="notifytime">{{ task.time }}</span>
               <button class="notifymodify notifyedit bfa" v-b-modal.taskedit @click="eNew(task.name,task.time,task.index)">
@@ -84,7 +101,7 @@
         :no-enforce-focus="true"
         :ok-title="$t('close')">
         <b-list-group v-if="plans.length">
-          <b-list-group-item button v-for="plan in plans" :key="plan.id" @click="planModify(plan.name)">{{ plan.name }}</b-list-group-item>
+          <b-list-group-item button v-for="plan in plans" :key="plan.id" @click="planModify(plan.id)">{{ plan.name }}</b-list-group-item>
         </b-list-group>
         <div v-if="pmbvisibility">
           <b-card no-body class="mb-1">
@@ -152,6 +169,17 @@
               required
             ></b-form-input>
           </b-form-group>
+          <b-form-group :label="$t('tmore')">
+            <b-form-checkbox
+              id="once"
+              v-model="isonce"
+              name="once"
+              value="once"
+              unchecked-value="isntonce"
+              v-b-tooltip.hover :title="$t('toncedescription')">
+                {{ $t('tonce') }}
+            </b-form-checkbox>
+          </b-form-group>
         </form>
       </b-modal>
       <b-modal
@@ -183,6 +211,17 @@
               required
             ></b-form-input>
           </b-form-group>
+          <!--<b-form-group :label="$t('tmore')">
+            <b-form-checkbox
+              id="eonce"
+              v-model="edittaskonce"
+              name="eonce"
+              value="once"
+              unchecked-value="isntonce"
+              v-b-tooltip.hover :title="$t('toncedescription')">
+                {{ $t('tonce') }}
+            </b-form-checkbox>
+          </b-form-group>-->
         </form>
       </b-modal>
       <b-modal
@@ -262,6 +301,7 @@
   const { Storage } = Plugins;
   //import VueTimepicker from 'vue2-timepicker'
   var Plan = AV.Object.extend('switchable_plans');
+  var Oncetask = AV.Object.extend('switchable_oncetasks');
   var alarm = new Audio();
   alarm.src = require("@/assets/alarm.mp3");
   export default {
@@ -291,6 +331,7 @@
           { value: 'absolute', text: this.$t('absolutetime') },
           { value: 'relative', text: this.$t('relativetime') },
         ],
+        isonce: "isntonce",
         taskname: '',
         tasktime: '00:00',
         tasktimepicked: {
@@ -299,10 +340,6 @@
         },
         edittaskname: '',
         edittasktime: '00:00',
-        edittasktimepicked: {
-          HH: '00',
-          mm: '00',
-        },
         edittaskindex: 1,
         i_deletetask: 1,
         //modal.planmanager.planmodifyboard
@@ -317,6 +354,7 @@
         iselectron: false,
         lang: 'en',
         version: '1.0.0',
+        oncetask: [],
       };
     },
     watch: {
@@ -337,10 +375,43 @@
       }
       if(AV.User.current())
       {
+        var oque = new AV.Query('switchable_oncetasks');
+        oque.equalTo('user',AV.User.current());
+        oque.ascending('createdAt');
+        var that = this;
+        oque.find().then(function (oresults) {
+          oresults.forEach((ot) => {
+            that.oncetask.push({
+                name: ot.get('name'),
+                time: ot.get('time'),
+                finished: ot.get('finished'),
+            });
+            that.intervalid = setInterval(() => {
+              let timeStamp = new Date();
+              if(that.thisplantype == 'relative') timeStamp = new Date() - that.starttime;
+              let hh = '00';
+              if(that.thisplantype == 'relative') hh = (new Date(timeStamp).getHours()-8) < 10? ("0" + (new Date(timeStamp).getHours()-8)): new Date(timeStamp).getHours()-8;
+              else hh = new Date(timeStamp).getHours() < 10? "0" + new Date(timeStamp).getHours(): new Date(timeStamp).getHours();
+              let mm = new Date(timeStamp).getMinutes() < 10? "0" + new Date(timeStamp).getMinutes(): new Date(timeStamp).getMinutes();
+              that.time = hh + ':' + mm;
+              if(that.oncetask)
+              {
+                that.oncetask.map((item, index) => {
+                  if ((item.time == that.time && that.thisplantype == 'absolute') || (item.time == that.time && that.thisplantype == 'relative' && that.starttime_bool)) 
+                  {
+                    that.notifytask(item.name);
+                    oncefinish(index);
+                  }
+                });
+              }
+            }, 60000);
+          });
+        }, function (error) {
+          console.error(error);
+        })
         var que = new AV.Query('switchable_plans');
         que.equalTo('user',AV.User.current());
         que.ascending('createdAt');
-        var that = this;
         que.find().then(function (results) {
           results.forEach((pl) => {
             that.plans.push({
@@ -402,10 +473,13 @@
         });
       },
       async i18nsetlang() {
-        const retlang = await Storage.get({ key:'lang' });
-        if(retlang.value != null) this.lang = retlang.value;
-        else this.lang = 'en';
-        this.$i18n.locale = retlang.value;
+        const keys = await Storage.keys();
+        if(keys.keys.indexOf('lang') != -1) {
+          const retlang = await Storage.get({ key:'lang' });
+          if(retlang.value != null) this.lang = retlang.value;
+          else this.lang = 'en', this.storagesetlang('en');
+        } else this.lang = 'en', this.storagesetlang('en');
+        this.$i18n.locale = this.lang;
       },
       i18nchinese() {
         this.lang = 'cn';
@@ -413,12 +487,12 @@
       i18nenglish() {
         this.lang = 'en';
       },
-      notifytask(title) {
+      notifytask(title,sound=true) {
         notify.methods.send({
           title: title,
           message: 'Start working on this task!',
         });
-        alarm.play();
+        if(sound) alarm.play();
       },
       chooseplan(planname, startbool=false) {
         this.starttime_bool = startbool;
@@ -441,14 +515,32 @@
         {
            // Push the name to submitted names
           this.loading = true;
-          this.plans[this.i_thisplan].tasks.push({
-            name: this.taskname,
-            time: this.tasktime,
-            index: this.plans[this.i_thisplan].index,
-          });
-          this.thisplan = this.plans[this.i_thisplan].tasks;
-          this.plans[this.i_thisplan].index ++;
-          this.taskUpdater();
+          if(this.isonce == 'once') {
+            var otask = new Oncetask();
+            otask.set('name', this.taskname);
+            otask.set('time', this.tasktime);
+            otask.set('finished', false);
+            otask.set('user', AV.User.current());
+            var that = this;
+            otask.save().then(function (ot) {
+              that.oncetask.push({
+                name: that.taskname,
+                time: that.tasktime,
+                finished: false,
+              });
+            }, function (error) {
+              console.error(error);
+            });
+          } else {
+            this.plans[this.i_thisplan].tasks.push({
+              name: this.taskname,
+              time: this.tasktime,
+              index: this.plans[this.i_thisplan].index,
+            });
+            this.thisplan = this.plans[this.i_thisplan].tasks;
+            this.plans[this.i_thisplan].index ++;
+            this.taskUpdater();
+          }
           this.loading = false;
         }
         else
@@ -459,6 +551,7 @@
       tNew() {
         this.taskname = '';
         this.tasktime = '00:00';
+        this.isonce = 'isntonce';
       },
       //modal(t) end
       //p = plan
@@ -631,9 +724,9 @@
           console.error(error);
         });
       },
-      planModify(name) {
+      planModify(iid) {
         this.plans.map((item, index) => {
-          if (item.name == name)
+          if (item.id == iid)
           {
             this.pmbvisibility = true;
             this.i_editplan = index;
@@ -643,6 +736,16 @@
           }
         })
       },
+      oncefinish(index) {
+        this.oncetask[index].finished = true;
+        var eo_task = AV.Object.createWithoutData('switchable_oncetasks', this.oncetask[index].id);
+        eo_task.set('finished', true);
+        eo_task.save().then(function() {
+          
+        }, function (error) {
+          console.error(error);
+        });
+      }
     },
   }
 </script>
