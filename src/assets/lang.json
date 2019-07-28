@@ -40,7 +40,8 @@
     "toncedescription": "如果这个任务不是每日计划的一部分，只需要执行一次，那么请勾选。执行后任务将不再被调用，下次开启Switchable此任务会消失",
     "etitle": "编辑任务信息",
     "finishedoncetask": "已提醒过的\"仅一次\"任务",
-    "notifyonce": "这是一个\"仅一次\"任务，它将被删除"
+    "notifyonce": "这是一个\"仅一次\"任务，它将被删除",
+    "proud": "自豪的使用 Capacitor"
   },
   "en": {
     "selectplan": "Select your Plan",
@@ -83,6 +84,7 @@
     "toncedescription": "If this task is not part of the daily plan, and should be noticed only once, select it. The task will vanish when Switchable launch again after the notification",
     "etitle": "Edit Task Information",
     "finishedoncetask": "Once (Noticed)",
-    "notifyonce": "It is a task which will only be noticed once. It'll be deleted now."
+    "notifyonce": "It is a task which will only be noticed once. It'll be deleted now.",
+    "proud": "Proudly Using Capacitor"
   }
 }

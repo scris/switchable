@@ -30,14 +30,14 @@
       <div id="notifies" style="-webkit-app-region: no-drag">
         <div v-if="oncetask.length">
           <div class="linediv notify" v-for="task in oncetask" :key="task.id">
-            <div class="notifypane"><span class="notifyname" v-bind:class="{ finishedoncetask: task.finished }">{{ task.name }}</span>&nbsp;<small class="text-muted once" v-if="!task.finished">{{ $t('tonce') }}</small><small class="text-muted once" v-if="task.finished">{{ $t('finishedoncetask') }}</small></div>
-            <div class="notifypane">
+            <div class="notifypane" v-if="task.plan == thisplanid"><span class="notifyname" v-bind:class="{ finishedoncetask: task.finished }">{{ task.name }}</span>&nbsp;<small class="text-muted once" v-if="!task.finished">{{ $t('tonce') }}</small><small class="text-muted once" v-if="task.finished">{{ $t('finishedoncetask') }}</small></div>
+            <div class="notifypane" v-if="task.plan == thisplanid">
               <span class="notifytime" v-bind:class="{ finishedoncetask: task.finished }">{{ task.time }}</span>
-              <button class="notifymodify notifyedit bfa"  v-bind:class="{ finishedoncetask: task.finished }" v-b-modal.taskedit @click="eNew(task.name,task.time,task.index)">
+              <button class="notifymodify notifyedit bfa"  v-bind:class="{ finishedoncetask: task.finished }" @click="onceeNew(task.name,task.time,task.id)" v-b-modal.oncetaskedit>
                 <!-- bfa = button with font-awesome -->
                 <i class="fa fa-edit"></i>
               </button>
-              <button class="notifymodify notifydelete bfa" v-bind:class="{ finishedoncetask: task.finished }" v-b-modal.deleteconfirmer @click="dNew(task.index)">
+              <button class="notifymodify notifydelete bfa" v-bind:class="{ finishedoncetask: task.finished }" @click="oncedNew(task.id)" v-b-modal.oncedeleteconfirmer>
                 <i class="fa fa-ban"></i>
               </button>
             </div>
@@ -211,17 +211,6 @@
               required
             ></b-form-input>
           </b-form-group>
-          <!--<b-form-group :label="$t('tmore')">
-            <b-form-checkbox
-              id="eonce"
-              v-model="edittaskonce"
-              name="eonce"
-              value="once"
-              unchecked-value="isntonce"
-              v-b-tooltip.hover :title="$t('toncedescription')">
-                {{ $t('tonce') }}
-            </b-form-checkbox>
-          </b-form-group>-->
         </form>
       </b-modal>
       <b-modal
@@ -231,6 +220,46 @@
         :ok-title="$t('submit')"
         :cancel-title="$t('cancel')"
         @ok="dSubmit"> 
+        {{ $t('dctext') }}
+      </b-modal>
+      <b-modal
+        id="oncetaskedit"
+        ref="oemodal"
+        :title="$t('etitle')"
+        @ok="onceeSubmit"
+        :ok-title="$t('submit')"
+        :cancel-title="$t('cancel')">
+        <form ref="eform">
+          <b-form-group
+            :label="$t('tname')"
+            label-for="oename-input"
+          >
+            <b-form-input
+              id="oename-input"
+              v-model="onceedittaskname"
+              required
+            ></b-form-input>
+          </b-form-group>
+          <b-form-group
+            :label="$t('ttime')"
+            label-for="oetime-input"
+          >
+            <b-form-input
+              id="oetime-input"
+              v-model="onceedittasktime"
+              type="time"
+              required
+            ></b-form-input>
+          </b-form-group>
+        </form>
+      </b-modal>
+      <b-modal
+        id="oncedeleteconfirmer"
+        :title="$t('confirm')"
+        ref="odcmodal"
+        :ok-title="$t('submit')"
+        :cancel-title="$t('cancel')"
+        @ok="oncedSubmit"> 
         {{ $t('dctext') }}
       </b-modal>
       <b-modal
@@ -284,7 +313,7 @@
         <b-btn @click="i18nenglish">English</b-btn></li>
         <div slot="modal-footer">
           <div class="settingsfooter">
-            <small class="form-text text-muted" id="abouttext">{{ $t('sabout') }} {{ version }}</small>
+            <small class="form-text text-muted" id="abouttext">{{ $t('sabout') }} {{ version }} <br> {{ $t('proud') }}</small>
             <b-button varient="primary" @click="$refs['smodal'].hide()">{{ $t('close') }}</b-button>
           </div>
         </div>
@@ -340,6 +369,10 @@
         },
         edittaskname: '',
         edittasktime: '00:00',
+        onceedittaskname: '',
+        onceedittasktime: '00:00',
+        onceedittaskid: 0,
+        oncedeletetaskid: 0,
         edittaskindex: 1,
         i_deletetask: 1,
         //modal.planmanager.planmodifyboard
@@ -377,7 +410,7 @@
       {
         var oque = new AV.Query('switchable_oncetasks');
         oque.equalTo('user',AV.User.current());
-        oque.ascending('createdAt');
+        oque.ascending('time');
         var that = this;
         oque.find().then(function (oresults) {
           oresults.forEach((ot) => {
@@ -385,26 +418,9 @@
                 name: ot.get('name'),
                 time: ot.get('time'),
                 finished: ot.get('finished'),
+                id: ot.id,
+                plan: ot.get('plan'),
             });
-            that.intervalid = setInterval(() => {
-              let timeStamp = new Date();
-              if(that.thisplantype == 'relative') timeStamp = new Date() - that.starttime;
-              let hh = '00';
-              if(that.thisplantype == 'relative') hh = (new Date(timeStamp).getHours()-8) < 10? ("0" + (new Date(timeStamp).getHours()-8)): new Date(timeStamp).getHours()-8;
-              else hh = new Date(timeStamp).getHours() < 10? "0" + new Date(timeStamp).getHours(): new Date(timeStamp).getHours();
-              let mm = new Date(timeStamp).getMinutes() < 10? "0" + new Date(timeStamp).getMinutes(): new Date(timeStamp).getMinutes();
-              that.time = hh + ':' + mm;
-              if(that.oncetask)
-              {
-                that.oncetask.map((item, index) => {
-                  if ((item.time == that.time && that.thisplantype == 'absolute') || (item.time == that.time && that.thisplantype == 'relative' && that.starttime_bool)) 
-                  {
-                    that.notifytask(item.name);
-                    oncefinish(index);
-                  }
-                });
-              }
-            }, 60000);
           });
         }, function (error) {
           console.error(error);
@@ -428,6 +444,7 @@
           that.thisplanid = that.plans[0].id;
           that.thisplanindex = that.plans[0].index;
           that.thisplantype = that.plans[0].type;
+          that.sorttasks();
           that.loading = false;
           that.intervalid = setInterval(() => {
             let timeStamp = new Date();
@@ -437,6 +454,16 @@
             else hh = new Date(timeStamp).getHours() < 10? "0" + new Date(timeStamp).getHours(): new Date(timeStamp).getHours();
             let mm = new Date(timeStamp).getMinutes() < 10? "0" + new Date(timeStamp).getMinutes(): new Date(timeStamp).getMinutes();
             that.time = hh + ':' + mm;
+            if(that.oncetask)
+            {
+              that.oncetask.map((item, index) => {
+                if ((item.time == that.time && that.thisplantype == 'absolute') || (item.time == that.time && that.thisplantype == 'relative' && that.starttime_bool)) 
+                {
+                  that.notifytask(item.name);
+                  that.oncefinish(index);
+                }
+              });
+            }
             if(that.plans[that.i_thisplan].tasks)
             {
               that.plans[that.i_thisplan].tasks.map((item, index) => {
@@ -521,13 +548,17 @@
             otask.set('time', this.tasktime);
             otask.set('finished', false);
             otask.set('user', AV.User.current());
+            otask.set('plan', this.thisplanid)
             var that = this;
             otask.save().then(function (ot) {
               that.oncetask.push({
                 name: that.taskname,
                 time: that.tasktime,
                 finished: false,
+                id: ot.id,
+                plan: that.thisplanid,
               });
+              that.sorttonceasks();
             }, function (error) {
               console.error(error);
             });
@@ -540,6 +571,7 @@
             this.thisplan = this.plans[this.i_thisplan].tasks;
             this.plans[this.i_thisplan].index ++;
             this.taskUpdater();
+            this.sortthistasks();
           }
           this.loading = false;
         }
@@ -635,6 +667,7 @@
           });
           this.thisplan = this.plans[this.i_thisplan].tasks;
           this.taskUpdater();
+          this.sortthistasks();
           this.loading = false;
         }
         else
@@ -683,7 +716,7 @@
               that.thisplanindex = that.plans[0].index;
               that.i_thisplan = 0;
             } else {
-              chooseplan(that.thisplanname, that.starttime_bool);
+              that.chooseplan(that.thisplanname, that.starttime_bool);
             }
             that.pmbvisibility = false;
           }, function (error) {
@@ -745,6 +778,64 @@
         }, function (error) {
           console.error(error);
         });
+      },
+      onceeSubmit() {
+        this.loading = true;
+        if(this.onceedittasktime != '' && this.onceedittaskname != '')
+        {
+          var eo_task = AV.Object.createWithoutData('switchable_oncetasks', this.onceedittaskid);
+          eo_task.set('name', this.onceedittaskname);
+          eo_task.set('time', this.onceedittasktime);
+          var that = this;
+          eo_task.save().then(function() {
+            that.oncetask.map((item, index) => {
+              if (item.id == that.onceedittaskid)
+              {
+                item.name = that.onceedittaskname;
+                item.time = that.onceedittasktime;
+              }
+            })
+            that.sortoncetasks();
+          }, function (error) {
+            console.error(error);
+          });
+            this.loading = false;
+          }
+        else
+        {
+          this.loading = false;
+          this.$refs['fnmodal'].show();
+        }
+      },
+      onceeNew(ename,etime,eid) {
+        this.onceedittaskname = ename;
+        this.onceedittasktime = etime;
+        this.onceedittaskid = eid;
+      },
+      oncedSubmit() {
+        this.loading = true;
+        var eod_task = AV.Object.createWithoutData('switchable_oncetasks', this.oncedeletetaskid);
+        var that = this;
+        eod_task.destroy().then(function (success) {
+            that.oncetask = that.oncetask.filter(ot => {
+              return ot.id != that.oncedeletetaskid;
+            });
+          }, function (error) {
+            console.error(error);
+        });
+        this.loading = false;
+      },
+      oncedNew(did) {
+        this.oncedeletetaskid = did;
+      },
+      sorttonceasks() {
+
+      },
+      sorttasks() {
+
+      },
+      sortthistasks() {
+
       }
     },
   }
