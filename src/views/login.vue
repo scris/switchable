@@ -162,7 +162,7 @@ export default {
               that.nvisibility = true;
             }
           });
-        } else if (process.env.VUE_APP_LINXF == 'web'){
+        } else if (process.env.VUE_APP_LINXF != 'electron') {
           if(Notification.permission != 'granted'){
             if(!('Notification' in window) ){
                 alert('Please turn to a modern browser to use Scris Switchable.');

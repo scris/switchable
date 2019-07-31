@@ -371,3 +371,7 @@ small.once {
 .finishedoncetask {
     color: gray;
 }
+
+.settingsleftbar {
+    padding-top: 0.375rem;
+}

@@ -308,9 +308,14 @@
         ok-only
         :title="$t('stitle')"
         ref="smodal">
-        <li><b-btn v-b-modal.loggingoutconfirmer>{{ $t('slogout') }}</b-btn></li>
-        <li><b-btn @click="i18nchinese">中文</b-btn>
-        <b-btn @click="i18nenglish">English</b-btn></li>
+        <b-row>
+          <b-col sm="2" class="settingsleftbar"><small>{{ $t('saccount') }}</small></b-col>
+          <b-col><b-btn v-b-modal.loggingoutconfirmer>{{ $t('slogout') }}</b-btn></b-col>
+        </b-row>
+        <b-row>
+          <b-col sm="2" class="settingsleftbar"><small>{{ $t('slocale') }}</small></b-col>
+          <b-col><b-btn @click="i18nchinese">中文</b-btn><b-btn @click="i18nenglish">English</b-btn></b-col>
+        </b-row>
         <div slot="modal-footer">
           <div class="settingsfooter">
             <small class="form-text text-muted" id="abouttext">{{ $t('sabout') }} {{ version }} <br> {{ $t('proud') }}</small>
@@ -469,11 +474,12 @@
               that.plans[that.i_thisplan].tasks.map((item, index) => {
                 if ((item.time == that.time && that.thisplantype == 'absolute') || (item.time == that.time && that.thisplantype == 'relative' && that.starttime_bool)) 
                 {
-                  that.notifytask(item.name);
+                  that.notifytask(item.name,item.id);
                 }
               });
             }
           }, 60000);
+          that.deleteoutdatedoncetasks();
         }, function (error) {
           console.error(error);
         })
@@ -514,9 +520,10 @@
       i18nenglish() {
         this.lang = 'en';
       },
-      notifytask(title,sound=true) {
+      notifytask(title,id,sound=true) {
         notify.methods.send({
           title: title,
+          id: id,
           message: 'Start working on this task!',
         });
         if(sound) alarm.play();
@@ -820,7 +827,7 @@
             that.oncetask = that.oncetask.filter(ot => {
               return ot.id != that.oncedeletetaskid;
             });
-          }, function (error) {
+        }, function (error) {
             console.error(error);
         });
         this.loading = false;
@@ -828,15 +835,44 @@
       oncedNew(did) {
         this.oncedeletetaskid = did;
       },
-      sorttonceasks() {
+      deleteoutdatedoncetasks() {
+        this.oncetask.map((item,index) => {
+          if(item.finished == true) {
+            this.oncedeleter(item.id);
+          }
+        })
+        this.oncetask = this.oncetask.filter(ot => {
+          return ot.finished != true;
+        })
+      },
+      oncedeleter(id) {
+        var eod_task = AV.Object.createWithoutData('switchable_oncetasks', id);
+        var that = this;
+        eod_task.destroy().then(function (success) {
 
+        }, function (error) {
+            console.error(error);
+        });
+      },
+      sorttonceasks() {
+        this.oncetask.sort((a,b) => {
+          return a.time > b.time;
+        })
       },
       sorttasks() {
-
+        this.plans.map((item,index) => {
+          item.tasks.sort((a,b) => {
+            return a.time > b.time;
+          })
+        })
       },
       sortthistasks() {
-
+        this.plans[this.i_thisplan].tasks.sort((a,b) => {
+          return a.time > b.time;
+        })
       }
+      // Todo Today: use capacitor's localmessage
+      // Todo Tomorrow: a picture when having no tasks && fix the bug about deleting plans
     },
   }
 </script>

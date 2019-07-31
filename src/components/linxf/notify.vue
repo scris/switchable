@@ -3,7 +3,8 @@
 </template>
 
 <script>
-//const notifier = require('node-notifier')
+import { Plugins } from '@capacitor/core';
+const { LocalNotifications } = Plugins;
 export default {
     name: 'notify',
     data() {
@@ -12,12 +13,11 @@ export default {
       };
     },
     methods: {
-        os () {
-            return process.platform
-        },
         send(obj) {
             var title = obj.title;
             var message = obj.message;
+            var id = obj.id;
+            /*
             var timeout = 5;
             if(obj.timeout != null) timeout = obj.timeout;
             if (process.env.VUE_APP_LINXF == 'capacitor') {
@@ -60,7 +60,14 @@ export default {
                     body: message,
                     icon: require("@/assets/notifyicon.png"),
                 });
-            }
+            }*/
+            LocalNotifications.schedule({
+                notifications: [{
+                    title: title,
+                    body: message,
+                    id: id,
+                }]
+            })
         }
     }
 }

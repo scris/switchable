@@ -41,7 +41,9 @@
     "etitle": "编辑任务信息",
     "finishedoncetask": "已提醒过的\"仅一次\"任务",
     "notifyonce": "这是一个\"仅一次\"任务，它将被删除",
-    "proud": "自豪的使用 Capacitor"
+    "proud": "自豪的使用 Capacitor",
+    "saccount": "账户操作",
+    "slocale": "语言设置"
   },
   "en": {
     "selectplan": "Select your Plan",
@@ -85,6 +87,8 @@
     "etitle": "Edit Task Information",
     "finishedoncetask": "Once (Noticed)",
     "notifyonce": "It is a task which will only be noticed once. It'll be deleted now.",
-    "proud": "Proudly Using Capacitor"
+    "proud": "Proudly Using Capacitor",
+    "saccount": "Account",
+    "slocale": "Locale"
   }
 }

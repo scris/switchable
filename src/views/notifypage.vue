@@ -12,12 +12,6 @@
 </template>
 
 <script>
-
-/*var ipc = window.electron.ipcRenderer;
-ipc.on('getNotify', (evt, msg) => {
-    document.getElementById('title').innerText = msg.title;
-    document.getElementById('message').innerText = msg.message;
-})*/
 export default {
   name: 'notifypage',
   data() {
