@@ -96,6 +96,7 @@ AV.init({
 	appKey: t43refwdskey,
 	region: ht5grfvfr5re,
 });
+var Plan = AV.Object.extend('switchable_plans');
 
 export default {
   name: 'login',
@@ -121,43 +122,43 @@ export default {
         plan.set('user', AV.User.current());
         var that = this;
         plan.save().then(function (pl) {
-          if (process.env.VUE_APP_LINXF == 'cordova') {
+          if (process.env.VUE_APP_LINXF == 'capacitor') {
             cordova.plugins.notification.local.hasPermission(function (granted) {
               if (granted) {
-                that.$router.push('i');
+                alert("Now Log In");
               } else {
                 that.nvisibility = true;
               }
             });
-          } else if (process.env.VUE_APP_LINXF == 'web'){
+          } else if (process.env.VUE_APP_LINXF != 'electron'){
             if(Notification.permission != 'granted'){
               if(!('Notification' in window) ){
                   alert('Please turn to a modern browser to use Scris Switchable.');
                   return;
               }
               Notification.requestPermission(function(permission) {
-                that.$router.push('i');
+                alert("Now Log In");
               });
             } else {
-              that.$router.push('i');
+              alert("Now Log In");
             }
           } else {
-            that.$router.push('i'); 
+            alert("Now Log In");
           }
         }, function (error) {
-          console.error(error);
+          alert(error.rawMessage);
         });
       }, (function (error) {
-        alert(JSON.stringify(error));
+        alert(error.rawMessage);
       }));
     },
     login() {
       var that = this;
       AV.User.logIn(that.email, that.pwd).then(function (loginedUser) {
-        if (process.env.VUE_APP_LINXF == 'cordova') {
+        if (process.env.VUE_APP_LINXF == 'capacitor') {
           cordova.plugins.notification.local.hasPermission(function (granted) {
             if (granted) {
-              that.$router.push('i');
+              that.$router.push('/');
             } else {
               that.nvisibility = true;
             }
@@ -183,7 +184,7 @@ export default {
     },
     noticed() {
       cordova.plugins.notification.local.requestPermission(function (granted) {
-        this.$router.push('i');
+        this.$router.push('/');
       });
     },
   },

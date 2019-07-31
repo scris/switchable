@@ -296,7 +296,6 @@
       </b-modal>
       <b-modal
         id="loggingoutconfirmer"
-        ok-only
         @ok="logout"
         :title="$t('confirm')"
         ref="locmodal"
