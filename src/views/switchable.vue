@@ -870,8 +870,6 @@
           return a.time > b.time;
         })
       }
-      // Todo Today: use capacitor's localmessage
-      // Todo Tomorrow: a picture when having no tasks && fix the bug about deleting plans
     },
   }
 </script>

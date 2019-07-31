@@ -9,7 +9,7 @@
     "electron-mac": "vue-cli-service build --mode electron && npx cap copy && cd electron && yarn run m && cd ../",
     "electron-dev": "vue-cli-service build --mode electron && npx cap copy && cd electron && yarn run e && cd ../",
     "capacitor-android": "vue-cli-service build --mode capacitor && npx cap copy && cd android && npx cap open android && cd ../",
-    "web": "vue-cli-service build --mode web",
+    "web": "rm -r docs && vue-cli-service build --mode web && cp -r -f www/ docs",
     "d": "yarn run dev",
     "e": "yarn run electron-mac",
     "ed": "yarn run electron-dev",
