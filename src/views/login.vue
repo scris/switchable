@@ -1,85 +1,24 @@
-<!--<template>
-  <div class="container">
-      <b-nav>
-        <b-nav-item active @click="tologin">Login</b-nav-item>
-        <b-nav-item @click="toregister">Register</b-nav-item>
-      </b-nav>
-      <b-form @submit="submit">
-        <b-form-group id="emailgroup" label="Email address:" label-for="emailinput" description="We'll never share your email with anyone else.">
-          <b-input id="emailinput" v-model="form.email" type="email" required placeholder="Enter email"></b-input>
-        </b-form-group>
-        <b-form-group id="pwdgroup" label="Your Password:" label-for="pwdinput">
-          <b-input id="pwdinput" v-model="form.pwd" required placeholder="Enter password" type="password"></b-input>
-        </b-form-group>
-        <b-button type="submit" variant="primary">{{ this.btnword }}</b-button>
-      </b-form>
-  </div>
-</template>
-
-<script>
-import AV from 'leancloud-storage';
-var APP_ID = 'C7SVWNehvavYoUH5cssIKYDH-MdYXbMMI';
-var APP_KEY = 'nJ2QMhw8deT5QwNt40rjsaK7';
-AV.init({
-  appId: APP_ID,
-  appKey: APP_KEY,
-  region: 'us'
-});
-
-export default {
-  name: 'login',
-  data() {
-      return {
-        form: {
-          email: '',
-          pwd: '',
-        },
-      btnword: 'Login',
-    };
-  },
-  methods: {
-    tologin() {
-        this.btnword = "Login";
-    },
-    toregister() {
-        this.btnword = "Register";
-    },
-    submit() {
-        if(this.btnword == "Login") this.login();
-        else this.register();
-    },
-    register() {
-        var that = this;
-        var user = new AV.User();
-        user.setUsername(that.form.email);
-        user.setPassword(that.form.pwd);
-        user.signUp().then(function (loginedUser) {
-            that.$router.push('i'); 
-        }, (function (error) {
-            alert(JSON.stringify(error));
-        }));
-    },
-    login() {
-                var that = this;
-        AV.User.logIn(that.form.email, that.form.pwd).then(function (loginedUser) {
-            that.$router.push('/i'); 
-        }, function (error) {
-            alert(JSON.stringify(error));
-        });
-      
-        },
-    },
-}
-</script>-->
+<i18n src="@/assets/lang.json"></i18n>
 <template>
-  <div id="container">
-    <b-input id="emailinput" v-model="email" type="email" required placeholder="Enter email"></b-input><br>
-    <b-input id="pwdinput" v-model="pwd" required placeholder="Enter password" type="password"></b-input>
-    <b-button @click="login" class="button loginbtn">Login</b-button>&nbsp;&nbsp;
-    <b-button @click="reg" class="button loginbtn">Register</b-button>
-    <b-modal id="noticer" ok-only :visible="nvisibility" @ok="noticed">
-        Now we will ask for permission to send you notifications. Please allow this, or we won't be able to notice you that it's time to start working on your tasks.
-    </b-modal>
+  <div class="container">
+    <div class="login">
+      <b-input id="emailinput" v-model="email" type="email" required :placeholder="$t('lemail')"></b-input><br>
+      <b-input id="pwdinput" v-model="pwd" required :placeholder="$t('lpassword')" type="password"></b-input>
+      <div class="bold">
+        <b-btn @click="login" class="button loginbtn dropdown-item">{{ $t('llogin') }}</b-btn>
+        <b-btn @click="reg" class="button loginbtn dropdown-item">{{ $t('lregister') }}</b-btn>
+      </div>
+      <b-modal id="noticer" ok-only :visible="nvisibility" @ok="noticed">
+          {{ $t('lpermission') }}
+      </b-modal>
+    </div>
+    <div class="linediv">
+      <b-btn class="dropdown-item langitem" @click="i18nchinese">中文</b-btn>
+      <b-btn class="dropdown-item" @click="i18nenglish">English</b-btn>
+    </div>
+    <div class="linediv">
+      <b-btn class="dropdown-item" @click="continueanonymous">{{ $t('lcontinueanonymous') }}</b-btn>
+    </div>
   </div>
 </template>
 
@@ -97,6 +36,8 @@ AV.init({
 	region: ht5grfvfr5re,
 });
 var Plan = AV.Object.extend('switchable_plans');
+import { Plugins } from '@capacitor/core';
+const { Storage } = Plugins;
 
 export default {
   name: 'login',
@@ -105,9 +46,46 @@ export default {
       email: '',
       pwd: '',
       nvisibility: false,
+      lang: 'en',
     };
   },
+  watch: {
+      async lang (val) {
+        this.storagesetlang(val);
+        this.$i18n.locale = val;
+      }
+  },
+  mounted: function() {
+    this.i18nsetlang();
+  },
   methods: {
+    async storagesetlang(val) {
+      await Storage.set({
+        key: 'lang',
+        value: val
+      });
+    },
+    async i18nsetlang() {
+      const keys = await Storage.keys();
+      if(keys.keys.indexOf('lang') != -1) {
+        const retlang = await Storage.get({ key:'lang' });
+        if(retlang.value != null) this.lang = retlang.value;
+        else this.lang = 'en', this.storagesetlang('en');
+      } else {
+        this.lang = 'en';
+        this.storagesetlang('en');
+      }
+      this.$i18n.locale = this.lang;
+    },
+    i18nchinese() {
+      this.lang = 'cn';
+    },
+    i18nenglish() {
+      this.lang = 'en';
+    },
+    continueanonymous() {
+      this.$router.push('/');
+    },
     reg() {
       var that = this;
       var user = new AV.User();
@@ -167,7 +145,7 @@ export default {
           if(Notification.permission != 'granted'){
             if(!('Notification' in window) ){
                 alert('Please turn to a modern browser to use Scris Switchable.');
-                return;
+                that.$router.push('/');
              }
              Notification.requestPermission(function(permission) {
                  that.$router.push('/');
@@ -183,8 +161,9 @@ export default {
       });
     },
     noticed() {
+      var that = this;
       cordova.plugins.notification.local.requestPermission(function (granted) {
-        this.$router.push('/');
+        that.$router.push('/');
       });
     },
   },

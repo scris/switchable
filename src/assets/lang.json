@@ -43,7 +43,13 @@
     "notifyonce": "这是一个\"仅一次\"任务，它将被删除",
     "proud": "自豪的使用 Capacitor",
     "saccount": "账户操作",
-    "slocale": "语言设置"
+    "slocale": "语言设置",
+    "llogin": "登录",
+    "lregister": "注册",
+    "lemail": "输入电子邮件地址",
+    "lpassword": "输入密码",
+    "lpermission": "现在我们会请求您同意我们发送通知，不然您将无法收到任务开始的提示。",
+    "lcontinueanonymous": "取消登录，继续离线使用"
   },
   "en": {
     "selectplan": "Select your Plan",
@@ -89,6 +95,12 @@
     "notifyonce": "It is a task which will only be noticed once. It'll be deleted now.",
     "proud": "Proudly Using Capacitor",
     "saccount": "Account",
-    "slocale": "Locale"
+    "slocale": "Locale",
+    "llogin": "Login",
+    "lregister": "Register",
+    "lemail": "Enter Email",
+    "lpassword": "Enter Password",
+    "lpermission": "Now we will ask for permission to send you notifications. Please allow this, or we won't be able to notice you that it's time to start working on your tasks.",
+    "lcontinueanonymous": "Continue Anonymous"
   }
 }
