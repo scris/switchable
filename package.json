@@ -1,6 +1,6 @@
 {
   "name": "switchable-cp",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": "Tianze Ds Qiu (slaaker@126.com)",
   "description": "Create amount of daily plans, then quickly switch from one to another. ",
   "license": "MIT",

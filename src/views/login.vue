@@ -7,7 +7,6 @@
       <div class="bold">
         <b-btn @click="login" class="button loginbtn dropdown-item">{{ $t('llogin') }}</b-btn>
         <b-btn @click="reg" class="button loginbtn dropdown-item">{{ $t('lregister') }}</b-btn>
-        <b-btn v-if="confirmlogin" @click="continueanonymous" class="button loginbtn dropdown-item">{{ $t('limlogin') }}</b-btn>
       </div>
       <b-modal id="noticer" ok-only ref="nvmodal" @ok="noticed">
           {{ $t('lpermission') }}
@@ -19,6 +18,9 @@
     </div>
     <div class="linediv">
       <b-btn class="dropdown-item" @click="continueanonymous">{{ $t('lcontinueanonymous') }}</b-btn>
+    </div>
+    <div class="linediv">
+      <b-btn class="dropdown-item" @click="continueanonymous">{{ $t('limlogin') }}</b-btn>
     </div>
   </div>
 </template>
