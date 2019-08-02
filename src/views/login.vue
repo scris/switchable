@@ -114,9 +114,8 @@ export default {
               }
             });
           } else if (process.env.VUE_APP_LINXF != 'electron'){
-            if(Notification.permission != 'granted'){
-              if(!('Notification' in window)){
-                alert('We can\'t notify you because your browser doesn\'t support it.');
+            if ('Notification' in window) {
+              if(Notification.permission == 'granted'){
                 window.location.href = window.location.origin;
                 that.confirmlogin = true;
               } else {
@@ -153,9 +152,8 @@ export default {
             }
           });
         } else if (process.env.VUE_APP_LINXF != 'electron') {
-          if(Notification.permission != 'granted'){
-            if(!('Notification' in window) ){
-              alert('We can\'t notify you because your browser doesn\'t support it.');
+          if ('Notification' in window) {
+            if(Notification.permission == 'granted'){
               window.location.href = window.location.origin;
               that.confirmlogin = true;
             } else {
