@@ -110,17 +110,18 @@ export default {
           } else if (process.env.VUE_APP_LINXF != 'electron'){
             if(Notification.permission != 'granted'){
               if(!('Notification' in window)){
-                  alert('We can\'t notify you because your browser doesn\'t support it.');
-                  that.$router.push('/');
+                alert('We can\'t notify you because your browser doesn\'t support it.');
+                window.location.href = window.location.origin;
+              } else {
+                Notification.requestPermission(function(permission) {
+                  window.location.href = window.location.origin;
+                });
               }
-              Notification.requestPermission(function(permission) {
-                that.$router.push('/');
-              });
             } else {
-              that.$router.push('/');
+              window.location.href = window.location.origin;
             }
           } else {
-            that.$router.push('/');
+            window.location.href = window.location.origin;
           } 
         }, function (error) {
           alert(error.rawMessage);
@@ -135,7 +136,7 @@ export default {
         if (process.env.VUE_APP_LINXF == 'capacitor') {
           cordova.plugins.notification.local.hasPermission(function (granted) {
             if (granted) {
-              that.$router.push('/');
+              window.location.href = window.location.origin;
             } else {
               that.$refs['nvmodal'].show();
             }
@@ -143,17 +144,19 @@ export default {
         } else if (process.env.VUE_APP_LINXF != 'electron') {
           if(Notification.permission != 'granted'){
             if(!('Notification' in window) ){
-                alert('We can\'t notify you because your browser doesn\'t support it.');
-                that.$router.push('/');
-             }
-             Notification.requestPermission(function(permission) {
-                that.$router.push('/');
-             });
-           } else {
-             that.$router.push('/');
-           }
+              alert('We can\'t notify you because your browser doesn\'t support it.');
+              window.location.href = window.location.origin;
+            } else {
+              Notification.requestPermission(function(permission) {
+                window.location.href = window.location.origin;
+              });
+            }
+          } else {
+            window.location.href = window.location.origin;
+          }
+          window.location.href = window.location.origin;
         } else {
-          that.$router.push('/'); 
+          window.location.href = window.location.origin;
         }
       }, function (error) {
         alert(error.rawMessage);
@@ -162,7 +165,7 @@ export default {
     noticed() {
       var that = this;
       cordova.plugins.notification.local.requestPermission(function (granted) {
-        that.$router.push('/');
+        window.location.href = window.location.origin;
       });
     },
   },

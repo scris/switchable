@@ -13,7 +13,7 @@ Vue.use(BootstrapVue)
 import VueI18n from 'vue-i18n'
 Vue.use(VueI18n)
 const i18n = new VueI18n({
-  locale: localStorage.getItem('lang') || 'en'
+  locale: 'en'
 })
 
 Vue.config.productionTip = false
