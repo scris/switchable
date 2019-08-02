@@ -399,12 +399,13 @@ small.once {
 }
 
 .login {
+    flex-grow: 2;
     margin-top: 30vh;
     display: flex;
     justify-content: flex-start;
     flex-direction: column;
     align-content: center;
-    height: 50vh;
+    height: 35vh;
 }
 
 .langitem {

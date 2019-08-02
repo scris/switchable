@@ -168,8 +168,6 @@ export default {
             window.location.href = window.location.origin;
             that.confirmlogin = true;
           }
-          window.location.href = window.location.origin;
-          that.confirmlogin = true;
         } else {
           window.location.href = window.location.origin;
           that.confirmlogin = true;
