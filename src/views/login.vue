@@ -19,9 +19,6 @@
     <div class="linediv">
       <b-btn class="dropdown-item" @click="continueanonymous">{{ $t('lcontinueanonymous') }}</b-btn>
     </div>
-    <div class="linediv">
-      <b-btn class="dropdown-item" @click="continueanonymous">{{ $t('limlogin') }}</b-btn>
-    </div>
   </div>
 </template>
 
