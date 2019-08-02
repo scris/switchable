@@ -1,6 +1,7 @@
 <i18n src="@/assets/lang.json"></i18n>
 <template>
   <div class="container">
+    <loading :active.sync="loading" :can-cancel="false" :is-full-page="true" loader="bars"></loading>
     <div id="planselectorcontainer" class="linediv">
       <div v-if="iselectron" class="btn logintitle">Switchable login</div>
       <div class="btn closewindowcontainer" style="-webkit-app-region: no-drag; -webkit-user-select: none">
@@ -27,6 +28,7 @@
     </div>
   </div>
 </template>
+<!--We need to notice that on iOS, if you don't login, your data can be vanished only because of the limitation of iOS.(or update to at least 12.2)-->
 
 <script>
 import AV from 'leancloud-storage';
@@ -42,11 +44,16 @@ AV.init({
 	region: ht5grfvfr5re,
 });
 var Plan = AV.Object.extend('switchable_plans');
+
 import { Plugins } from '@capacitor/core';
 const { Storage } = Plugins;
+import Loading from 'vue-loading-overlay';
 
 export default {
   name: 'login',
+  components: {
+    Loading,
+  },
   data() {
     return {
       email: '',
@@ -55,6 +62,7 @@ export default {
       lang: 'en',
       confirmlogin: false, 
       iselectron: false,
+      loading: false,
     };
   },
   watch: {
@@ -100,6 +108,7 @@ export default {
     },
     reg() {
       var that = this;
+      this.loading = true;
       var user = new AV.User();
       user.setUsername(that.email);
       user.setPassword(that.pwd);
@@ -114,76 +123,93 @@ export default {
           if (process.env.VUE_APP_LINXF == 'capacitor') {
             cordova.plugins.notification.local.hasPermission(function (granted) {
               if (granted) {
+                that.loading = false;
                 that.$router.push('/');
                 that.confirmlogin = true;
               } else {
+                that.loading = false;
                 that.$refs['nvmodal'].show();
               }
             });
-          } else if (process.env.VUE_APP_LINXF != 'electron'){
+          } else if (process.env.VUE_APP_LINXF != 'electron') {
             if ('Notification' in window) {
-              if(Notification.permission == 'granted'){
+              if(Notification.permission == 'granted') {
+                that.loading = false;
                 that.$router.push('/');
                 that.confirmlogin = true;
               } else {
                 Notification.requestPermission(function(permission) {
+                  that.loading = false;
                   that.$router.push('/');
                   that.confirmlogin = true;
                 });
               }
             } else {
+              that.loading = false;
               that.$router.push('/');
               that.confirmlogin = true;
             }
           } else {
+            that.loading = false;
             that.$router.push('/');
             that.confirmlogin = true;
           } 
         }, function (error) {
+          that.loading = false;
           alert(error.rawMessage);
         });
       }, (function (error) {
+        that.loading = false;
         alert(error.rawMessage);
       }));
     },
     login() {
+      this.loading = true;
       var that = this;
       AV.User.logIn(that.email, that.pwd).then(function (loginedUser) {
         if (process.env.VUE_APP_LINXF == 'capacitor') {
           cordova.plugins.notification.local.hasPermission(function (granted) {
             if (granted) {
+              that.loading = false;
               that.$router.push('/');
               that.confirmlogin = true;
             } else {
+              that.loading = false;
               that.$refs['nvmodal'].show();
             }
           });
         } else if (process.env.VUE_APP_LINXF != 'electron') {
           if ('Notification' in window) {
             if(Notification.permission == 'granted'){
+              that.loading = false;
               that.$router.push('/');
               that.confirmlogin = true;
             } else {
               Notification.requestPermission(function(permission) {
+                that.loading = false;
                 that.$router.push('/');
                 that.confirmlogin = true;
               });
             }
           } else {
+            that.loading = false;
             that.$router.push('/');
             that.confirmlogin = true;
           }
         } else {
+          that.loading = false;
           that.$router.push('/');
           that.confirmlogin = true;
         }
       }, function (error) {
+        that.loading = false;
         alert(error.rawMessage);
       });
     },
     noticed() {
       var that = this;
       cordova.plugins.notification.local.requestPermission(function (granted) {
+        that.loading = false;
         that.$router.push('/');
       });
     },

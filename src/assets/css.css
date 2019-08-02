@@ -371,7 +371,7 @@ option {
 }
 
 #abouttext {
-    flex-grow: 1;
+    padding-left: 0.75rem;
 }
 
 ::selection {
@@ -414,4 +414,8 @@ small.once {
 
 .logintitle {
     padding-left: 0;
+}
+
+.text-muted-icon {
+    color: #454b4e;
 }
