@@ -7,6 +7,7 @@
       <div class="bold">
         <b-btn @click="login" class="button loginbtn dropdown-item">{{ $t('llogin') }}</b-btn>
         <b-btn @click="reg" class="button loginbtn dropdown-item">{{ $t('lregister') }}</b-btn>
+        <b-btn v-if="confirmlogin" @click="continueanonymous" class="button loginbtn dropdown-item">{{ $t('limlogin') }}</b-btn>
       </div>
       <b-modal id="noticer" ok-only ref="nvmodal" @ok="noticed">
           {{ $t('lpermission') }}
@@ -47,6 +48,7 @@ export default {
       pwd: '',
       nvisibility: false,
       lang: 'en',
+      confirmlogin: false, 
     };
   },
   watch: {
@@ -85,6 +87,7 @@ export default {
     },
     continueanonymous() {
       this.$router.push('/');
+      this.confirmlogin = false;
     },
     reg() {
       var that = this;
@@ -102,7 +105,8 @@ export default {
           if (process.env.VUE_APP_LINXF == 'capacitor') {
             cordova.plugins.notification.local.hasPermission(function (granted) {
               if (granted) {
-                alert("Now Log In");
+                window.location.href = window.location.origin;
+                that.confirmlogin = true;
               } else {
                 that.$refs['nvmodal'].show();
               }
@@ -112,16 +116,20 @@ export default {
               if(!('Notification' in window)){
                 alert('We can\'t notify you because your browser doesn\'t support it.');
                 window.location.href = window.location.origin;
+                that.confirmlogin = true;
               } else {
                 Notification.requestPermission(function(permission) {
                   window.location.href = window.location.origin;
+                  that.confirmlogin = true;
                 });
               }
             } else {
               window.location.href = window.location.origin;
+              that.confirmlogin = true;
             }
           } else {
             window.location.href = window.location.origin;
+            that.confirmlogin = true;
           } 
         }, function (error) {
           alert(error.rawMessage);
@@ -137,6 +145,7 @@ export default {
           cordova.plugins.notification.local.hasPermission(function (granted) {
             if (granted) {
               window.location.href = window.location.origin;
+              that.confirmlogin = true;
             } else {
               that.$refs['nvmodal'].show();
             }
@@ -146,17 +155,22 @@ export default {
             if(!('Notification' in window) ){
               alert('We can\'t notify you because your browser doesn\'t support it.');
               window.location.href = window.location.origin;
+              that.confirmlogin = true;
             } else {
               Notification.requestPermission(function(permission) {
                 window.location.href = window.location.origin;
+                that.confirmlogin = true;
               });
             }
           } else {
             window.location.href = window.location.origin;
+            that.confirmlogin = true;
           }
           window.location.href = window.location.origin;
+          that.confirmlogin = true;
         } else {
           window.location.href = window.location.origin;
+          that.confirmlogin = true;
         }
       }, function (error) {
         alert(error.rawMessage);
