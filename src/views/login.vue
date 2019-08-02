@@ -1,6 +1,12 @@
 <i18n src="@/assets/lang.json"></i18n>
 <template>
   <div class="container">
+    <div id="planselectorcontainer" class="linediv">
+      <div v-if="iselectron" class="btn logintitle">Switchable login</div>
+      <div class="btn closewindowcontainer" style="-webkit-app-region: no-drag; -webkit-user-select: none">
+        <a v-if="iselectron" class="btn bfa closewindow topicon btn-light" href="javascript:window.close()"><i class="fa fa-times"></i></a>
+      </div>
+    </div>
     <div class="login">
       <div class="linediv"><b-input id="emailinput" v-model="email" type="email" required :placeholder="$t('lemail')"></b-input></div>
       <div class="linediv"><b-input id="pwdinput" v-model="pwd" required :placeholder="$t('lpassword')" type="password"></b-input></div>
@@ -48,6 +54,7 @@ export default {
       nvisibility: false,
       lang: 'en',
       confirmlogin: false, 
+      iselectron: false,
     };
   },
   watch: {
@@ -58,6 +65,9 @@ export default {
   },
   mounted: function() {
     this.i18nsetlang();
+    if(process.env.VUE_APP_LINXF == 'electron') {
+      this.iselectron = true;
+    }
   },
   methods: {
     async storagesetlang(val) {
@@ -104,7 +114,7 @@ export default {
           if (process.env.VUE_APP_LINXF == 'capacitor') {
             cordova.plugins.notification.local.hasPermission(function (granted) {
               if (granted) {
-                window.location.href = window.location.origin;
+                that.$router.push('/');
                 that.confirmlogin = true;
               } else {
                 that.$refs['nvmodal'].show();
@@ -113,20 +123,20 @@ export default {
           } else if (process.env.VUE_APP_LINXF != 'electron'){
             if ('Notification' in window) {
               if(Notification.permission == 'granted'){
-                window.location.href = window.location.origin;
+                that.$router.push('/');
                 that.confirmlogin = true;
               } else {
                 Notification.requestPermission(function(permission) {
-                  window.location.href = window.location.origin;
+                  that.$router.push('/');
                   that.confirmlogin = true;
                 });
               }
             } else {
-              window.location.href = window.location.origin;
+              that.$router.push('/');
               that.confirmlogin = true;
             }
           } else {
-            window.location.href = window.location.origin;
+            that.$router.push('/');
             that.confirmlogin = true;
           } 
         }, function (error) {
@@ -142,7 +152,7 @@ export default {
         if (process.env.VUE_APP_LINXF == 'capacitor') {
           cordova.plugins.notification.local.hasPermission(function (granted) {
             if (granted) {
-              window.location.href = window.location.origin;
+              that.$router.push('/');
               that.confirmlogin = true;
             } else {
               that.$refs['nvmodal'].show();
@@ -151,20 +161,20 @@ export default {
         } else if (process.env.VUE_APP_LINXF != 'electron') {
           if ('Notification' in window) {
             if(Notification.permission == 'granted'){
-              window.location.href = window.location.origin;
+              that.$router.push('/');
               that.confirmlogin = true;
             } else {
               Notification.requestPermission(function(permission) {
-                window.location.href = window.location.origin;
+                that.$router.push('/');
                 that.confirmlogin = true;
               });
             }
           } else {
-            window.location.href = window.location.origin;
+            that.$router.push('/');
             that.confirmlogin = true;
           }
         } else {
-          window.location.href = window.location.origin;
+          that.$router.push('/');
           that.confirmlogin = true;
         }
       }, function (error) {
@@ -174,7 +184,7 @@ export default {
     noticed() {
       var that = this;
       cordova.plugins.notification.local.requestPermission(function (granted) {
-        window.location.href = window.location.origin;
+        that.$router.push('/');
       });
     },
   },

@@ -411,3 +411,7 @@ small.once {
 .langitem {
     width: 3rem;
 }
+
+.logintitle {
+    padding-left: 0;
+}
