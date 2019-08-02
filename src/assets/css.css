@@ -55,6 +55,17 @@ body {
     padding: 0px 0px 0px 0px;
 }
 
+.btn-light:active {
+    background-color: #fdfdfd !important;
+    border-color: #fdfdfd !important;
+}
+
+.btn-secondary:active {
+    background-color: #fdfdfd !important;
+    border-color: #fdfdfd !important;
+    color: black !important;
+}
+
 button {
     letter-spacing: 0.15rem !important;
 }
@@ -182,6 +193,11 @@ select {
 .form-control:focus, .form-control.focus {
     box-shadow: none;
     color: darkred;
+    background-color: #fdfdfd !important;
+}
+
+.form-control:active, .form-control:hover {
+    background-color: #fdfdfd !important;
 }
 
 .modal-dialog {
@@ -280,6 +296,12 @@ option {
     color: darkred;
     text-decoration: none;
     background-color: transparent;
+}
+
+.dropdown-item:active {
+    color: #4B000099 !important;
+    text-decoration: none;
+    background-color: transparent !important;
 }
 
 .dropdown-item:focus, .dropdown-item.focus {

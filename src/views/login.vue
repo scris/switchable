@@ -2,13 +2,13 @@
 <template>
   <div class="container">
     <div class="login">
-      <b-input id="emailinput" v-model="email" type="email" required :placeholder="$t('lemail')"></b-input><br>
-      <b-input id="pwdinput" v-model="pwd" required :placeholder="$t('lpassword')" type="password"></b-input>
+      <div class="linediv"><b-input id="emailinput" v-model="email" type="email" required :placeholder="$t('lemail')"></b-input></div>
+      <div class="linediv"><b-input id="pwdinput" v-model="pwd" required :placeholder="$t('lpassword')" type="password"></b-input></div>
       <div class="bold">
         <b-btn @click="login" class="button loginbtn dropdown-item">{{ $t('llogin') }}</b-btn>
         <b-btn @click="reg" class="button loginbtn dropdown-item">{{ $t('lregister') }}</b-btn>
       </div>
-      <b-modal id="noticer" ok-only :visible="nvisibility" @ok="noticed">
+      <b-modal id="noticer" ok-only ref="nvmodal" @ok="noticed">
           {{ $t('lpermission') }}
       </b-modal>
     </div>
@@ -98,31 +98,30 @@ export default {
         plan.set('index', 1);
         plan.set('type', 'absolute');
         plan.set('user', AV.User.current());
-        var that = this;
         plan.save().then(function (pl) {
           if (process.env.VUE_APP_LINXF == 'capacitor') {
             cordova.plugins.notification.local.hasPermission(function (granted) {
               if (granted) {
                 alert("Now Log In");
               } else {
-                that.nvisibility = true;
+                that.$refs['nvmodal'].show();
               }
             });
           } else if (process.env.VUE_APP_LINXF != 'electron'){
             if(Notification.permission != 'granted'){
-              if(!('Notification' in window) ){
-                  alert('Please turn to a modern browser to use Scris Switchable.');
-                  return;
+              if(!('Notification' in window)){
+                  alert('We can\'t notify you because your browser doesn\'t support it.');
+                  that.$router.push('/');
               }
               Notification.requestPermission(function(permission) {
-                alert("Now Log In");
+                that.$router.push('/');
               });
             } else {
-              alert("Now Log In");
+              that.$router.push('/');
             }
           } else {
-            alert("Now Log In");
-          }
+            that.$router.push('/');
+          } 
         }, function (error) {
           alert(error.rawMessage);
         });
@@ -138,17 +137,17 @@ export default {
             if (granted) {
               that.$router.push('/');
             } else {
-              that.nvisibility = true;
+              that.$refs['nvmodal'].show();
             }
           });
         } else if (process.env.VUE_APP_LINXF != 'electron') {
           if(Notification.permission != 'granted'){
             if(!('Notification' in window) ){
-                alert('Please turn to a modern browser to use Scris Switchable.');
+                alert('We can\'t notify you because your browser doesn\'t support it.');
                 that.$router.push('/');
              }
              Notification.requestPermission(function(permission) {
-                 that.$router.push('/');
+                that.$router.push('/');
              });
            } else {
              that.$router.push('/');
@@ -157,7 +156,7 @@ export default {
           that.$router.push('/'); 
         }
       }, function (error) {
-        alert(JSON.stringify(error));
+        alert(error.rawMessage);
       });
     },
     noticed() {
