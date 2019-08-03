@@ -25,7 +25,7 @@
     "slogout": "登出",
     "sabout": "Scris Switchable",
     "confirm": "请确认",
-    "loctext": "你真的要登出吗？",
+    "loctext": "你真的要登出吗？将停止同步。同时，如果您一会尝试登录一个不同的账户，本地数据将被覆盖。（数据仍然存在原账户中）",
     "fntext": "填写每一个空格，然后再试一次。",
     "lmntext": "你至少需要一个计划。",
     "rgctext": "你真的要退出当前的相对时间计划吗？",
@@ -42,8 +42,19 @@
     "finishedoncetask": "已提醒过的\"仅一次\"任务",
     "notifyonce": "这是一个\"仅一次\"任务，它将被删除",
     "proud": "自豪的使用 Capacitor",
-    "saccount": "账户操作",
-    "slocale": "语言设置"
+    "saccount": "账户",
+    "slocale": "语言",
+    "saboutbar": "关于",
+    "sauthor": "作者：Tianze Ds Qiu",
+    "sothercontributor": "和其他贡献者",
+    "scontribute": "贡献：",
+    "slogin": "登录来完成同步",
+    "llogin": "登录",
+    "lregister": "注册",
+    "lemail": "输入电子邮件地址",
+    "lpassword": "输入密码",
+    "lpermission": "现在我们会请求您同意我们发送通知，不然您将无法收到任务开始的提示。",
+    "lcontinueanonymous": "取消登录，继续离线使用"
   },
   "en": {
     "selectplan": "Select your Plan",
@@ -71,7 +82,7 @@
     "slogout": "Log Out",
     "sabout": "Scris Switchable",
     "confirm": "Please Confirm",
-    "loctext": "Are you going to log out?",
+    "loctext": "Are you going to log out? Your data won't be synced anymore. And if you log in a different account later, your data might be overwritten.（Don't worry, your data is safe upon the cloud）",
     "fntext": "Make sure you filled every line, then try again.",
     "lmntext": "You must at least have one plan.",
     "rgctext": "Are you sure to get out of a relative plan?",
@@ -89,6 +100,17 @@
     "notifyonce": "It is a task which will only be noticed once. It'll be deleted now.",
     "proud": "Proudly Using Capacitor",
     "saccount": "Account",
-    "slocale": "Locale"
+    "slocale": "Locale",
+    "saboutbar": "About",
+    "sauthor": "Author: Tianze Ds Qiu",
+    "sothercontributor": "and other contributors",
+    "scontribute": "Contribute:",
+    "slogin": "Login to Sync",
+    "llogin": "Login",
+    "lregister": "Register",
+    "lemail": "Enter Email",
+    "lpassword": "Enter Password",
+    "lpermission": "Now we will ask for permission to send you notifications. Please allow this, or we won't be able to notice you that it's time to start working on your tasks.",
+    "lcontinueanonymous": "Continue Anonymous"
   }
 }

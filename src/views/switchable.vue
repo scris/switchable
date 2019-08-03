@@ -309,7 +309,10 @@
         ref="smodal">
         <b-row>
           <b-col sm="2" class="settingsleftbar"><small>{{ $t('saccount') }}</small></b-col>
-          <b-col><b-btn v-b-modal.loggingoutconfirmer>{{ $t('slogout') }}</b-btn></b-col>
+          <b-col>
+            <b-btn v-if="islogin" v-b-modal.loggingoutconfirmer>{{ $t('slogout') }}</b-btn>
+            <b-btn v-if="!islogin" @click="gologin">{{ $t('slogin') }}</b-btn>
+          </b-col>
         </b-row>
         <b-row>
           <b-col sm="2" class="settingsleftbar"><small>{{ $t('slocale') }}</small></b-col>
@@ -341,12 +344,9 @@
     name: 'switchable',
     components: {
       Loading,
-      //VueTimepicker,
     },
     data() {
       return {
-        packageno: '0.2.0',
-        buildno: '4',
         time: '00:00',
         thisplan: [],
         i_thisplan: 0,
@@ -402,6 +402,12 @@
           { value: 'absolute', text: this.$t('absolutetime') },
           { value: 'relative', text: this.$t('relativetime') },
         ];
+      },
+      async plans (val) {
+        this.storageset(val);
+      },
+      async oncetask (val) {
+        this.storageset(val);
       }
     },
     mounted: function() {
@@ -412,6 +418,28 @@
       }
       if(AV.User.current())
       {
+        this.islogin = true;
+        this.sync();
+      } else {
+        this.islogin = false;
+        
+        this.loading = false;
+      }
+    },
+    beforeDestroy: function() {
+      clearInterval(this.intervalid);
+    },
+    methods: {
+      isiPad (userAgent) {
+        return (userAgent.indexOf("iPad") > -1);
+      },
+      isiPhone (userAgent) {
+        return (userAgent.indexOf("iPhone") > -1);
+      },
+      isiOS (userAgent) {
+        return this.isiPad(userAgent) || this.isiPhone(userAgent);
+      },
+      sync() {
         var oque = new AV.Query('switchable_oncetasks');
         oque.equalTo('user',AV.User.current());
         oque.ascending('time');
@@ -482,18 +510,14 @@
         }, function (error) {
           console.error(error);
         })
-      } else {
-        this.$router.push('login');
-      }
-    },
-    beforeDestroy: function() {
-      clearInterval(this.intervalid);
-    },
-    methods: {
+      },
+      gologin() {
+        this.$router.push('/login');
+      },
       logout() {
         var that = this;
         AV.User.logOut().then(function (user) {
-          that.$router.push('/login');
+          that.islogin = false;
         }, function (error) {
           console.error(error);
         });
@@ -501,6 +525,12 @@
       async storagesetlang(val) {
         await Storage.set({
           key: 'lang',
+          value: val
+        });
+      },
+      async storageset(key,val) {
+        await Storage.set({
+          key: key,
           value: val
         });
       },
@@ -512,6 +542,29 @@
           else this.lang = 'en', this.storagesetlang('en');
         } else this.lang = 'en', this.storagesetlang('en');
         this.$i18n.locale = this.lang;
+      },
+      async storagegetdata() {
+        const keys = await Storage.keys();
+        if(keys.keys.indexOf('plan') != -1) {
+          const splan = await Storage.get({ key:'plan' })
+          this.plans = splan.value;
+        } else {
+          this.plans = [{
+            id: 1,
+            name: 'Plan 1',
+            index: 1,
+            tasks: [],
+            type: 'absolute',
+            user: 'local',
+          }];
+        }
+        if(keys.keys.indexOf('oncetask') != -1) {
+          const sotask = await Storage.get({ key:'oncetask' })
+          this.oncetask = sotask.value;
+        } else {
+          this.oncetask = [];
+        }
+        // not considering the switch of id and user between local and cloud yet
       },
       i18nchinese() {
         this.lang = 'cn';
