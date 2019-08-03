@@ -1,87 +1,34 @@
-<!--<template>
-  <div class="container">
-      <b-nav>
-        <b-nav-item active @click="tologin">Login</b-nav-item>
-        <b-nav-item @click="toregister">Register</b-nav-item>
-      </b-nav>
-      <b-form @submit="submit">
-        <b-form-group id="emailgroup" label="Email address:" label-for="emailinput" description="We'll never share your email with anyone else.">
-          <b-input id="emailinput" v-model="form.email" type="email" required placeholder="Enter email"></b-input>
-        </b-form-group>
-        <b-form-group id="pwdgroup" label="Your Password:" label-for="pwdinput">
-          <b-input id="pwdinput" v-model="form.pwd" required placeholder="Enter password" type="password"></b-input>
-        </b-form-group>
-        <b-button type="submit" variant="primary">{{ this.btnword }}</b-button>
-      </b-form>
-  </div>
-</template>
-
-<script>
-import AV from 'leancloud-storage';
-var APP_ID = 'C7SVWNehvavYoUH5cssIKYDH-MdYXbMMI';
-var APP_KEY = 'nJ2QMhw8deT5QwNt40rjsaK7';
-AV.init({
-  appId: APP_ID,
-  appKey: APP_KEY,
-  region: 'us'
-});
-
-export default {
-  name: 'login',
-  data() {
-      return {
-        form: {
-          email: '',
-          pwd: '',
-        },
-      btnword: 'Login',
-    };
-  },
-  methods: {
-    tologin() {
-        this.btnword = "Login";
-    },
-    toregister() {
-        this.btnword = "Register";
-    },
-    submit() {
-        if(this.btnword == "Login") this.login();
-        else this.register();
-    },
-    register() {
-        var that = this;
-        var user = new AV.User();
-        user.setUsername(that.form.email);
-        user.setPassword(that.form.pwd);
-        user.signUp().then(function (loginedUser) {
-            that.$router.push('i'); 
-        }, (function (error) {
-            alert(JSON.stringify(error));
-        }));
-    },
-    login() {
-                var that = this;
-        AV.User.logIn(that.form.email, that.form.pwd).then(function (loginedUser) {
-            that.$router.push('/i'); 
-        }, function (error) {
-            alert(JSON.stringify(error));
-        });
-      
-        },
-    },
-}
-</script>-->
+<i18n src="@/assets/lang.json"></i18n>
 <template>
-  <div id="container">
-    <b-input id="emailinput" v-model="email" type="email" required placeholder="Enter email"></b-input><br>
-    <b-input id="pwdinput" v-model="pwd" required placeholder="Enter password" type="password"></b-input>
-    <b-button @click="login" class="button loginbtn">Login</b-button>&nbsp;&nbsp;
-    <b-button @click="reg" class="button loginbtn">Register</b-button>
-    <b-modal id="noticer" ok-only :visible="nvisibility" @ok="noticed">
-        Now we will ask for permission to send you notifications. Please allow this, or we won't be able to notice you that it's time to start working on your tasks.
-    </b-modal>
+  <div class="container">
+    <loading :active.sync="loading" :can-cancel="false" :is-full-page="true" loader="bars"></loading>
+    <div id="planselectorcontainer" class="linediv">
+      <div v-if="iselectron" class="btn logintitle">Switchable login</div>
+      <div class="btn closewindowcontainer" style="-webkit-app-region: no-drag; -webkit-user-select: none">
+        <a v-if="iselectron" class="btn bfa closewindow topicon btn-light" href="javascript:window.close()"><i class="fa fa-times"></i></a>
+      </div>
+    </div>
+    <div class="login">
+      <div class="linediv"><b-input id="emailinput" v-model="email" type="email" required :placeholder="$t('lemail')"></b-input></div>
+      <div class="linediv"><b-input id="pwdinput" v-model="pwd" required :placeholder="$t('lpassword')" type="password"></b-input></div>
+      <div class="bold">
+        <b-btn @click="login" class="button loginbtn dropdown-item">{{ $t('llogin') }}</b-btn>
+        <b-btn @click="reg" class="button loginbtn dropdown-item">{{ $t('lregister') }}</b-btn>
+      </div>
+      <b-modal id="noticer" ok-only ref="nvmodal" @ok="noticed">
+          {{ $t('lpermission') }}
+      </b-modal>
+    </div>
+    <div class="linediv">
+      <b-btn class="dropdown-item langitem" @click="i18nchinese">中文</b-btn>
+      <b-btn class="dropdown-item" @click="i18nenglish">English</b-btn>
+    </div>
+    <div class="linediv">
+      <b-btn class="dropdown-item" @click="continueanonymous">{{ $t('lcontinueanonymous') }}</b-btn>
+    </div>
   </div>
 </template>
+<!--We need to notice that on iOS, if you don't login, your data can be vanished only because of the limitation of iOS.(or update to at least 12.2)-->
 
 <script>
 import AV from 'leancloud-storage';
@@ -98,18 +45,70 @@ AV.init({
 });
 var Plan = AV.Object.extend('switchable_plans');
 
+import { Plugins } from '@capacitor/core';
+const { Storage } = Plugins;
+import Loading from 'vue-loading-overlay';
+
 export default {
   name: 'login',
+  components: {
+    Loading,
+  },
   data() {
     return {
       email: '',
       pwd: '',
       nvisibility: false,
+      lang: 'en',
+      confirmlogin: false, 
+      iselectron: false,
+      loading: false,
     };
   },
+  watch: {
+      async lang (val) {
+        this.storagesetlang(val);
+        this.$i18n.locale = val;
+      }
+  },
+  mounted: function() {
+    this.i18nsetlang();
+    if(process.env.VUE_APP_LINXF == 'electron') {
+      this.iselectron = true;
+    }
+  },
   methods: {
+    async storagesetlang(val) {
+      await Storage.set({
+        key: 'lang',
+        value: val
+      });
+    },
+    async i18nsetlang() {
+      const keys = await Storage.keys();
+      if(keys.keys.indexOf('lang') != -1) {
+        const retlang = await Storage.get({ key:'lang' });
+        if(retlang.value != null) this.lang = retlang.value;
+        else this.lang = 'en', this.storagesetlang('en');
+      } else {
+        this.lang = 'en';
+        this.storagesetlang('en');
+      }
+      this.$i18n.locale = this.lang;
+    },
+    i18nchinese() {
+      this.lang = 'cn';
+    },
+    i18nenglish() {
+      this.lang = 'en';
+    },
+    continueanonymous() {
+      this.$router.push('/');
+      this.confirmlogin = false;
+    },
     reg() {
       var that = this;
+      this.loading = true;
       var user = new AV.User();
       user.setUsername(that.email);
       user.setPassword(that.pwd);
@@ -120,71 +119,98 @@ export default {
         plan.set('index', 1);
         plan.set('type', 'absolute');
         plan.set('user', AV.User.current());
-        var that = this;
         plan.save().then(function (pl) {
           if (process.env.VUE_APP_LINXF == 'capacitor') {
             cordova.plugins.notification.local.hasPermission(function (granted) {
               if (granted) {
-                alert("Now Log In");
+                that.loading = false;
+                that.$router.push('/');
+                that.confirmlogin = true;
               } else {
-                that.nvisibility = true;
+                that.loading = false;
+                that.$refs['nvmodal'].show();
               }
             });
-          } else if (process.env.VUE_APP_LINXF != 'electron'){
-            if(Notification.permission != 'granted'){
-              if(!('Notification' in window) ){
-                  alert('Please turn to a modern browser to use Scris Switchable.');
-                  return;
+          } else if (process.env.VUE_APP_LINXF != 'electron') {
+            if ('Notification' in window) {
+              if(Notification.permission == 'granted') {
+                that.loading = false;
+                that.$router.push('/');
+                that.confirmlogin = true;
+              } else {
+                Notification.requestPermission(function(permission) {
+                  that.loading = false;
+                  that.$router.push('/');
+                  that.confirmlogin = true;
+                });
               }
-              Notification.requestPermission(function(permission) {
-                alert("Now Log In");
-              });
             } else {
-              alert("Now Log In");
+              that.loading = false;
+              that.$router.push('/');
+              that.confirmlogin = true;
             }
           } else {
-            alert("Now Log In");
-          }
+            that.loading = false;
+            that.$router.push('/');
+            that.confirmlogin = true;
+          } 
         }, function (error) {
+          that.loading = false;
           alert(error.rawMessage);
         });
       }, (function (error) {
+        that.loading = false;
         alert(error.rawMessage);
       }));
     },
     login() {
+      this.loading = true;
       var that = this;
       AV.User.logIn(that.email, that.pwd).then(function (loginedUser) {
         if (process.env.VUE_APP_LINXF == 'capacitor') {
           cordova.plugins.notification.local.hasPermission(function (granted) {
             if (granted) {
+              that.loading = false;
               that.$router.push('/');
+              that.confirmlogin = true;
             } else {
-              that.nvisibility = true;
+              that.loading = false;
+              that.$refs['nvmodal'].show();
             }
           });
         } else if (process.env.VUE_APP_LINXF != 'electron') {
-          if(Notification.permission != 'granted'){
-            if(!('Notification' in window) ){
-                alert('Please turn to a modern browser to use Scris Switchable.');
-                return;
-             }
-             Notification.requestPermission(function(permission) {
-                 that.$router.push('/');
-             });
-           } else {
-             that.$router.push('/');
-           }
+          if ('Notification' in window) {
+            if(Notification.permission == 'granted'){
+              that.loading = false;
+              that.$router.push('/');
+              that.confirmlogin = true;
+            } else {
+              Notification.requestPermission(function(permission) {
+                that.loading = false;
+                that.$router.push('/');
+                that.confirmlogin = true;
+              });
+            }
+          } else {
+            that.loading = false;
+            that.$router.push('/');
+            that.confirmlogin = true;
+          }
         } else {
-          that.$router.push('/'); 
+          that.loading = false;
+          that.$router.push('/');
+          that.confirmlogin = true;
         }
       }, function (error) {
-        alert(JSON.stringify(error));
+        that.loading = false;
+        alert(error.rawMessage);
       });
     },
     noticed() {
+      var that = this;
       cordova.plugins.notification.local.requestPermission(function (granted) {
-        this.$router.push('/');
+        that.loading = false;
+        that.$router.push('/');
       });
     },
   },

@@ -55,6 +55,17 @@ body {
     padding: 0px 0px 0px 0px;
 }
 
+.btn-light:active {
+    background-color: #fdfdfd !important;
+    border-color: #fdfdfd !important;
+}
+
+.btn-secondary:active {
+    background-color: #fdfdfd !important;
+    border-color: #fdfdfd !important;
+    color: black !important;
+}
+
 button {
     letter-spacing: 0.15rem !important;
 }
@@ -182,6 +193,11 @@ select {
 .form-control:focus, .form-control.focus {
     box-shadow: none;
     color: darkred;
+    background-color: #fdfdfd !important;
+}
+
+.form-control:active, .form-control:hover {
+    background-color: #fdfdfd !important;
 }
 
 .modal-dialog {
@@ -282,6 +298,12 @@ option {
     background-color: transparent;
 }
 
+.dropdown-item:active {
+    color: #4B000099 !important;
+    text-decoration: none;
+    background-color: transparent !important;
+}
+
 .dropdown-item:focus, .dropdown-item.focus {
     color: darkred;
     text-decoration: none;
@@ -349,7 +371,7 @@ option {
 }
 
 #abouttext {
-    flex-grow: 1;
+    padding-left: 0.75rem;
 }
 
 ::selection {
@@ -374,4 +396,26 @@ small.once {
 
 .settingsleftbar {
     padding-top: 0.375rem;
+}
+
+.login {
+    flex-grow: 2;
+    margin-top: 30vh;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-content: center;
+    height: 35vh;
+}
+
+.langitem {
+    width: 3rem;
+}
+
+.logintitle {
+    padding-left: 0;
+}
+
+.text-muted-icon {
+    color: #454b4e;
 }

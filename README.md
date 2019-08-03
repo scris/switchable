@@ -13,13 +13,13 @@ Copy `src/assets/example_leancloud.json` to `src/assets/leancloud.json` and modi
 # install dependencies
 yarn
 
-# build for electron using cordova-electron (mac & win)
+# build for electron using capacitor (default only mac, support mac, win & linux)
 yarn run e
 
-# build for android using cordova-android
+# build for android using capacitor
 yarn run c
 
-# build for web
+# build for web into docs/ (we use docs/ to serve github pages)
 yarn run w
 
 ```
