@@ -1,6 +1,6 @@
 {
   "name": "switchable",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Create amount of daily plans, then quickly switch from one to another. ",
   "main": "index.js",
   "scripts": {

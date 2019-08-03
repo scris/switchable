@@ -299,14 +299,16 @@
         @ok="logout"
         :title="$t('confirm')"
         ref="locmodal"
-        :ok-title="$t('submit')">  
+        :ok-title="$t('submit')"
+        :cancel-title="$t('cancel')">  
         {{ $t('loctext') }}
       </b-modal>
       <b-modal
         id="settingspanel"
         ok-only
         :title="$t('stitle')"
-        ref="smodal">
+        ref="smodal"
+        :ok-title="$t('close')">
         <b-row>
           <b-col sm="2" class="settingsleftbar"><small>{{ $t('saccount') }}</small></b-col>
           <b-col><b-btn v-b-modal.loggingoutconfirmer>{{ $t('slogout') }}</b-btn></b-col>
@@ -321,16 +323,11 @@
             <small class="form-text text-muted" id="abouttext">
               {{ $t('sabout') }} {{ version }} <br> 
               {{ $t('proud') }} <br> 
-              {{ $t('sauthor') }} <a class="text-muted-icon" href="https://github.com/scris" target="_blank"><i class="fab fa-github"></i></a>&nbsp;<a class="text-muted-icon" href="mailto:tianze@scris.top" target="_blank"><i class="fa fa-envelope"></i></a> {{ $t('sothercontributor') }} <br>
+              {{ $t('sauthor') }} <a class="text-muted-icon" href="https://github.com/scris" target="_blank"><i class="fab fa-github"></i></a>&nbsp;<a class="text-muted-icon" v-if="!isonios" href="mailto:tianze@scris.top" target="_blank"><i class="fa fa-envelope"></i></a> {{ $t('sothercontributor') }} <br>
               {{ $t('scontribute') }} <a class="text-muted-icon" href="https://github.com/scris/switchable/" target="_blank"><i class="fab fa-github"></i></a>
             </small>
           </b-col>
         </b-row>
-        <div slot="modal-footer">
-          <div class="settingsfooter">
-            <b-button varient="primary" @click="$refs['smodal'].hide()">{{ $t('close') }}</b-button>
-          </div>
-        </div>
       </b-modal>
     </div>
 </template>
@@ -342,7 +339,6 @@
   import 'vue-loading-overlay/dist/vue-loading.css';
   import { Plugins } from '@capacitor/core';
   const { Storage } = Plugins;
-  //import VueTimepicker from 'vue2-timepicker'
   var Plan = AV.Object.extend('switchable_plans');
   var Oncetask = AV.Object.extend('switchable_oncetasks');
   var alarm = new Audio();
@@ -399,6 +395,8 @@
         intervalid: 0,
         loading: true,
         iselectron: false,
+        islogin: false,
+        isonios: false,
         lang: 'en',
         version: '1.0.0',
         oncetask: [],
@@ -420,8 +418,10 @@
       if(process.env.VUE_APP_LINXF == 'electron') {
         this.iselectron = true;
       }
+      this.isonios = this.isiOS(navigator.userAgent);
       if(AV.User.current())
       {
+        this.islogin = true;
         var oque = new AV.Query('switchable_oncetasks');
         oque.equalTo('user',AV.User.current());
         oque.ascending('time');
@@ -493,16 +493,26 @@
           console.error(error);
         })
       } else {
-        this.$router.push('/login');
+        this.islogin = false;
       }
     },
     beforeDestroy: function() {
       clearInterval(this.intervalid);
     },
     methods: {
+      isiPad (userAgent) {
+        return (userAgent.indexOf("iPad") > -1);
+      },
+      isiPhone (userAgent) {
+        return (userAgent.indexOf("iPhone") > -1);
+      },
+      isiOS (userAgent) {
+        return this.isiPad(userAgent) || this.isiPhone(userAgent);
+      },
       logout() {
         var that = this;
         AV.User.logOut().then(function (user) {
+          that.islogin = false;
           that.$router.push('/login');
         }, function (error) {
           console.error(error);
