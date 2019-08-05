@@ -202,8 +202,8 @@ export default {
           that.confirmlogin = true;
         }
       }, function (error) {
-        that.loading = false;
         alert(error.rawMessage);
+        that.loading = false;
       });
     },
     noticed() {
