@@ -574,7 +574,7 @@
         if(keys.keys.indexOf('oncetask') != -1) {
           const sotask = await Storage.get({ key:'oncetask' })
           this.oncetask = JSON.parse(sotask.value);
-          this.sorttonceasks();
+          this.sortonceasks();
         } else {
           this.oncetask = [];
         }
@@ -631,7 +631,7 @@
                   id: ot.id,
                   plan: that.thisplanid,
                 });
-                that.sorttonceasks();
+                that.sortonceasks();
               }, function (error) {
                 console.error(error);
               });
@@ -643,7 +643,7 @@
                 id: new Date().getTime(),
                 plan: this.thisplanid,
               });
-              this.sorttonceasks();
+              this.sortonceasks();
               this.storagesetjson('oncetask',this.oncetask);
             }
           } else {
@@ -987,7 +987,7 @@
           this.storagesetjson('oncetask',this.oncetask);
         }
       },
-      sorttonceasks() {
+      sortonceasks() {
         this.oncetask.sort((a,b) => {
           return a.time > b.time;
         })

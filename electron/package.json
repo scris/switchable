@@ -22,7 +22,7 @@
     "electron"
   ],
   "author": "",
-  "license": "MPLv2.0",
+  "license": "MPL-2.0",
   "build": {
     "appId": "com.scrisstudio.switchasble",
     "productName": "Scris Switchable",

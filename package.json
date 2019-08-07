@@ -3,7 +3,7 @@
   "version": "0.4.0",
   "author": "Tianze Ds Qiu (slaaker@126.com)",
   "description": "Create amount of daily plans, then quickly switch from one to another. ",
-  "license": "MIT",
+  "license": "MPL-2.0",
   "scripts": {
     "dev": "vue-cli-service serve",
     "electron-mac": "vue-cli-service build --mode electron && npx cap copy && cd electron && yarn run m && cd ../",
