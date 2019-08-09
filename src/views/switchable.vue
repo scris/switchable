@@ -435,6 +435,7 @@
         this.storagegetdata();
         this.loading = false;
       }
+      this.setintervals();
     },
     beforeDestroy: function() {
       clearInterval(this.intervalid);
@@ -488,41 +489,44 @@
           that.thisplantype = that.plans[0].type;
           that.sorttasks();
           that.loading = false;
-          that.intervalid = setInterval(() => {
-            let timeStamp = new Date();
-            if(that.thisplantype == 'relative') timeStamp = new Date() - that.starttime;
-            let hh = '00';
-            if(that.thisplantype == 'relative') hh = (new Date(timeStamp).getHours()-8) < 10? ("0" + (new Date(timeStamp).getHours()-8)): new Date(timeStamp).getHours()-8;
-            else hh = new Date(timeStamp).getHours() < 10? "0" + new Date(timeStamp).getHours(): new Date(timeStamp).getHours();
-            let mm = new Date(timeStamp).getMinutes() < 10? "0" + new Date(timeStamp).getMinutes(): new Date(timeStamp).getMinutes();
-            that.time = hh + ':' + mm;
-            if(that.oncetask)
-            {
-              that.oncetask.map((item, index) => {
-                if ((item.time == that.time && that.thisplantype == 'absolute') || (item.time == that.time && that.thisplantype == 'relative' && that.starttime_bool)) 
-                {
-                  that.notifytask(item.name);
-                  that.oncefinish(index);
-                }
-              });
-            }
-            if(that.plans[that.i_thisplan].tasks)
-            {
-              that.plans[that.i_thisplan].tasks.map((item, index) => {
-                if ((item.time == that.time && that.thisplantype == 'absolute') || (item.time == that.time && that.thisplantype == 'relative' && that.starttime_bool)) 
-                {
-                  that.notifytask(item.name,item.id);
-                }
-              });
-            }
-          }, 60000);
-          that.deleteoutdatedoncetasks();
         }, function (error) {
           console.error(error);
         })
       },
       gologin() {
         this.$router.push('/login');
+      },
+      setintervals() {
+        var that = this;
+        that.intervalid = setInterval(() => {
+          let timeStamp = new Date();
+          if(that.thisplantype == 'relative') timeStamp = new Date() - that.starttime;
+          let hh = '00';
+          if(that.thisplantype == 'relative') hh = (new Date(timeStamp).getHours()-8) < 10? ("0" + (new Date(timeStamp).getHours()-8)): new Date(timeStamp).getHours()-8;
+          else hh = new Date(timeStamp).getHours() < 10? "0" + new Date(timeStamp).getHours(): new Date(timeStamp).getHours();
+          let mm = new Date(timeStamp).getMinutes() < 10? "0" + new Date(timeStamp).getMinutes(): new Date(timeStamp).getMinutes();
+          that.time = hh + ':' + mm;
+          if(that.oncetask)
+          {
+            that.oncetask.map((item, index) => {
+              if ((item.time == that.time && that.thisplantype == 'absolute') || (item.time == that.time && that.thisplantype == 'relative' && that.starttime_bool)) 
+              {
+                that.notifytask(item.name);
+                that.oncefinish(index);
+              }
+            });
+          }
+          if(that.plans[that.i_thisplan].tasks)
+          {
+            that.plans[that.i_thisplan].tasks.map((item, index) => {
+              if ((item.time == that.time && that.thisplantype == 'absolute') || (item.time == that.time && that.thisplantype == 'relative' && that.starttime_bool)) 
+              {
+                that.notifytask(item.name,item.id);
+              }
+            });
+          }
+        }, 60000);
+        that.deleteoutdatedoncetasks();
       },
       logout() {
         var that = this;
