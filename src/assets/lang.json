@@ -54,7 +54,8 @@
     "lemail": "输入电子邮件地址",
     "lpassword": "输入密码",
     "lpermission": "现在我们会请求您同意我们发送通知，不然您将无法收到任务开始的提示。",
-    "lcontinueanonymous": "取消登录，继续离线使用"
+    "lcontinueanonymous": "取消登录，继续离线使用",
+    "lnotswitchableuser": "您还不是 Switchable 用户，将使用您的本地数据作为同步数据。我们不会使用您的数据。"
   },
   "en": {
     "selectplan": "Select your Plan",
@@ -111,6 +112,7 @@
     "lemail": "Enter Email",
     "lpassword": "Enter Password",
     "lpermission": "Now we will ask for permission to send you notifications. Please allow this, or we won't be able to notice you that it's time to start working on your tasks.",
-    "lcontinueanonymous": "Continue Anonymous"
+    "lcontinueanonymous": "Continue Anonymous",
+    "lnotswitchableuser": "You haven't been a user of Switchable, will upload your data to the cloud. It's all secure, we won't use your info."
   }
 }

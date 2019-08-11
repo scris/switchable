@@ -1,6 +1,15 @@
 <i18n src="@/assets/lang.json"></i18n>
 <template>
   <div class="container">
+    <b-modal
+      id="notswitchableuser"
+      ok-only
+      :title="$t('confirm')"
+      ref="nsumodal"
+      :ok-title="$t('submit')"
+      @ok="nsulogin">  
+      {{ $t('lnotswitchableuser') }} 
+    </b-modal>
     <loading :active.sync="loading" :can-cancel="false" :is-full-page="true" loader="bars"></loading>
     <div id="planselectorcontainer" class="linediv">
       <div v-if="iselectron" class="btn logintitle">Switchable login</div>
@@ -44,6 +53,7 @@ AV.init({
 	region: ht5grfvfr5re,
 });
 var Plan = AV.Object.extend('switchable_plans');
+var Oncetask = AV.Object.extend('switchable_oncetasks');
 
 import { Plugins } from '@capacitor/core';
 const { Storage } = Plugins;
@@ -63,6 +73,8 @@ export default {
       confirmlogin: false, 
       iselectron: false,
       loading: false,
+      plans: [],
+      oncetask: [],
     };
   },
   watch: {
@@ -73,6 +85,7 @@ export default {
   },
   mounted: function() {
     this.i18nsetlang();
+    this.storagegetdata();
     if(process.env.VUE_APP_LINXF == 'electron') {
       this.iselectron = true;
     }
@@ -112,6 +125,7 @@ export default {
       var user = new AV.User();
       user.setUsername(that.email);
       user.setPassword(that.pwd);
+      user.set('isUserOfSwitchable',true);
       user.signUp().then(function (loginedUser) {
         var plan = new Plan();
         plan.set('name', 'Default');
@@ -123,9 +137,7 @@ export default {
           if (process.env.VUE_APP_LINXF == 'capacitor') {
             cordova.plugins.notification.local.hasPermission(function (granted) {
               if (granted) {
-                that.loading = false;
-                that.$router.push('/');
-                that.confirmlogin = true;
+                that.whenlogin();
               } else {
                 that.loading = false;
                 that.$refs['nvmodal'].show();
@@ -134,25 +146,17 @@ export default {
           } else if (process.env.VUE_APP_LINXF != 'electron') {
             if ('Notification' in window) {
               if(Notification.permission == 'granted') {
-                that.loading = false;
-                that.$router.push('/');
-                that.confirmlogin = true;
+                that.whenlogin();
               } else {
                 Notification.requestPermission(function(permission) {
-                  that.loading = false;
-                  that.$router.push('/');
-                  that.confirmlogin = true;
+                  that.whenlogin();
                 });
               }
             } else {
-              that.loading = false;
-              that.$router.push('/');
-              that.confirmlogin = true;
+              that.whenlogin();
             }
           } else {
-            that.loading = false;
-            that.$router.push('/');
-            that.confirmlogin = true;
+            that.whenlogin();
           } 
         }, function (error) {
           that.loading = false;
@@ -170,9 +174,7 @@ export default {
         if (process.env.VUE_APP_LINXF == 'capacitor') {
           cordova.plugins.notification.local.hasPermission(function (granted) {
             if (granted) {
-              that.loading = false;
-              that.$router.push('/');
-              that.confirmlogin = true;
+              that.whenlogin();
             } else {
               that.loading = false;
               that.$refs['nvmodal'].show();
@@ -181,25 +183,17 @@ export default {
         } else if (process.env.VUE_APP_LINXF != 'electron') {
           if ('Notification' in window) {
             if(Notification.permission == 'granted'){
-              that.loading = false;
-              that.$router.push('/');
-              that.confirmlogin = true;
+              that.whenlogin();
             } else {
               Notification.requestPermission(function(permission) {
-                that.loading = false;
-                that.$router.push('/');
-                that.confirmlogin = true;
+                that.whenlogin();
               });
             }
           } else {
-            that.loading = false;
-            that.$router.push('/');
-            that.confirmlogin = true;
+            that.whenlogin();
           }
         } else {
-          that.loading = false;
-          that.$router.push('/');
-          that.confirmlogin = true;
+          that.whenlogin();
         }
       }, function (error) {
         alert(error.rawMessage);
@@ -212,6 +206,64 @@ export default {
         that.loading = false;
         that.$router.push('/');
       });
+    },
+    nsuintologin() {
+      this.loading = false;
+      this.$router.push('/');
+      this.confirmlogin = true;
+    },
+    nsulogin() {
+      var that = this;
+      this.plans.map((item, index) => {
+        var plan = new Plan();
+        plan.set('name', item.name);
+        plan.set('tasks',item.tasks)
+        plan.set('type', item.type);
+        plan.set('user', AV.User.current());
+        plan.set('index', item.index);
+        plan.save().then(function (pl) {
+          
+        }, function (error) {
+          alert(error.rawMessage);
+        });
+      });
+      that.oncetask.map((item, index) => {
+        var oncetask = new Oncetask();
+        oncetask.set('name', item.name);
+        oncetask.set('time', item.time);
+        oncetask.set('finished',item.finished)
+        oncetask.set('plan', item.plan.toString());
+        oncetask.set('user', AV.User.current());
+        oncetask.save().then(function (pl) {
+          var user = AV.User.current();
+          user.set('isUserOfSwitchable', true);
+          user.save().then(function (user) {});
+          that.nsuintologin();
+        }, function (error) {
+          alert(error.rawMessage);
+        });
+      });
+    },
+    whenlogin() {
+      this.conflictsolver();
+    },
+    conflictsolver() {
+      if(!AV.User.current().get('isUserOfSwitchable')) {
+        this.$refs['nsumodal'].show();
+      } else {
+
+      }
+    },
+    async storagegetdata() {
+      const keys = await Storage.keys();
+      if(keys.keys.indexOf('plan') != -1) {
+        const splan = await Storage.get({ key:'plan' })
+        this.plans = JSON.parse(splan.value);
+      }
+      if(keys.keys.indexOf('oncetask') != -1) {
+        const sotask = await Storage.get({ key:'oncetask' })
+        this.oncetask = JSON.parse(sotask.value);
+      }
     },
   },
 };

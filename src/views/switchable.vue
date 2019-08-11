@@ -466,7 +466,7 @@
             });
           });
         }, function (error) {
-          console.error(error);
+          alert(error.rawMessage);
         })
         var que = new AV.Query('switchable_plans');
         que.equalTo('user',AV.User.current());
@@ -490,7 +490,7 @@
           that.sorttasks();
           that.loading = false;
         }, function (error) {
-          console.error(error);
+          alert(error.rawMessage);
         })
       },
       gologin() {
@@ -533,7 +533,7 @@
         AV.User.logOut().then(function (user) {
           that.islogin = false;
         }, function (error) {
-          console.error(error);
+          alert(error.rawMessage);
         });
       },
       async storagesetlang(val) {
@@ -637,7 +637,7 @@
                 });
                 that.sortonceasks();
               }, function (error) {
-                console.error(error);
+                alert(error.rawMessage);
               });
             } else {
               this.oncetask.push({
@@ -698,7 +698,7 @@
               that.chooseplan(that.planname);
               that.loading = false;
             }, function (error) {
-              console.error(error);
+              alert(error.rawMessage);
               that.loading = false;
             });
           } else {
@@ -738,7 +738,7 @@
               that.plans[that.i_editplan].type = that.editplantimetype;
               if(that.i_thisplan == that.i_editplan) that.chooseplan(that.editplanname, that.starttime_bool);
             }, function (error) {
-              console.error(error);
+              alert(error.rawMessage);
             });
           } else {
             this.plans[this.i_editplan].name = this.editplanname;
@@ -828,7 +828,7 @@
               }
               that.pmbvisibility = false;
             }, function (error) {
-              console.error(error);
+              alert(error.rawMessage);
             });
           } else {
             this.plans = this.plans.filter(dplan => {
@@ -879,7 +879,7 @@
           u_task.save().then(function() {
             
           }, function (error) {
-            console.error(error);
+            alert(error.rawMessage);
           });
         } else {
           this.storagesetjson('plan',this.plans);
@@ -905,7 +905,7 @@
           eo_task.save().then(function() {
             
           }, function (error) {
-            console.error(error);
+            alert(error.rawMessage);
           });
         } else {
           this.storagesetjson('oncetask',this.oncetask);
@@ -930,7 +930,7 @@
               })
               that.sortoncetasks();
             }, function (error) {
-              console.error(error);
+              alert(error.rawMessage);
             });
             this.loading = false;
           } else {
@@ -958,7 +958,7 @@
                 return ot.id != that.oncedeletetaskid;
               });
           }, function (error) {
-              console.error(error);
+              alert(error.rawMessage);
           });
         } else {
           this.storagesetjson('oncetask',this.oncetask);
@@ -985,7 +985,7 @@
           eod_task.destroy().then(function (success) {
 
           }, function (error) {
-              console.error(error);
+              alert(error.rawMessage);
           });
         } else {
           this.storagesetjson('oncetask',this.oncetask);
