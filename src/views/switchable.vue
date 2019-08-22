@@ -27,6 +27,7 @@
         <b-btn class="relativebtn" variant="light" v-if="!starttime_bool" v-b-modal.relativeconfirmer>{{ $t('startrplan') }}</b-btn>
         <b-btn class="relativebtn" variant="light" v-if="starttime_bool" @click="gNew">{{ $t('outrplan') }}</b-btn>
       </div>
+      
       <div id="notifies" style="-webkit-app-region: no-drag">
         <div v-if="oncetask.length">
           <div class="linediv notify" v-for="task in oncetask" :key="task.id">
@@ -146,7 +147,9 @@
         @show="tNew"
         :ok-title="$t('submit')"
         :cancel-title="$t('cancel')">
+
         <form ref="tform">
+
           <b-form-group
             :label="$t('tname')"
             label-for="tname-input"
@@ -160,14 +163,9 @@
           </b-form-group>
           <b-form-group
             :label="$t('ttime')"
-            label-for="time-input"
+            label-for="timeinput"
           >
-            <b-form-input
-              id="time-input"
-              v-model="tasktime"
-              type="time"
-              required
-            ></b-form-input>
+            <VueCtkDateTimePicker v-model="tasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></VueCtkDateTimePicker>
           </b-form-group>
           <b-form-group :label="$t('tmore')">
             <b-form-checkbox
@@ -202,14 +200,9 @@
           </b-form-group>
           <b-form-group
             :label="$t('ttime')"
-            label-for="time-input"
+            label-for="etimeinput"
           >
-            <b-form-input
-              id="time-input"
-              v-model="edittasktime"
-              type="time"
-              required
-            ></b-form-input>
+            <VueCtkDateTimePicker v-model="edittasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></VueCtkDateTimePicker>
           </b-form-group>
         </form>
       </b-modal>
@@ -242,14 +235,9 @@
           </b-form-group>
           <b-form-group
             :label="$t('ttime')"
-            label-for="oetime-input"
+            label-for="oetimeinput"
           >
-            <b-form-input
-              id="oetime-input"
-              v-model="onceedittasktime"
-              type="time"
-              required
-            ></b-form-input>
+            <VueCtkDateTimePicker v-model="onceedittasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></VueCtkDateTimePicker>
           </b-form-group>
         </form>
       </b-modal>
@@ -341,6 +329,8 @@
   import Loading from 'vue-loading-overlay';
   import 'vue-loading-overlay/dist/vue-loading.css';
   import { Plugins } from '@capacitor/core';
+  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+  import '@/assets/vue-ctk-date-time-picker.css';
   const { Storage } = Plugins;
   var Plan = AV.Object.extend('switchable_plans');
   var Oncetask = AV.Object.extend('switchable_oncetasks');
@@ -350,6 +340,7 @@
     name: 'switchable',
     components: {
       Loading,
+      VueCtkDateTimePicker,
     },
     data() {
       return {
