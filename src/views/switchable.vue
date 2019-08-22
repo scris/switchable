@@ -71,6 +71,7 @@
         :ok-title="$t('submit')"
         :cancel-title="$t('cancel')">
         <form ref="pform">
+          <input type="text" style="display:none;"/>
           <b-form-group
             :label="$t('pname')"
             label-for="pname-input"
@@ -80,6 +81,7 @@
               v-model="planname"
               :placeholder="$t('pplanname')"
               required
+              @keyup.enter.native="pSubmit"
             ></b-form-input>
           </b-form-group>
           <b-form-group
@@ -89,6 +91,7 @@
               id="ptype-input"
               v-model="plantimetype"
               :options="plantimetypeoptions"
+              @keyup.enter.native="pSubmit"
             ></b-form-select>
             <b-tooltip target="ptype-input" varient="light">{{ $t('timetypedescription') }}</b-tooltip>
           </b-form-group>
@@ -112,10 +115,11 @@
             <b-collapse id="accordion-edit" accordion="pmb-accordion" role="tabpanel">
               <b-card-body>
                 <form ref="peform" @submit="peSubmit" @reset="peNew">
+                  <input type="text" style="display:none;"/>
                   <b-form-group :label="$t('pname')" label-for="pename-input">
-                    <b-form-input id="pename-input" v-model="editplanname" required></b-form-input>
+                    <b-form-input id="pename-input" v-model="editplanname" required @keyup.enter.native="peSubmit"></b-form-input>
                   </b-form-group>
-                  <b-form-group :label="$t('ptimetype')" label-for="petype-input">
+                  <b-form-group :label="$t('ptimetype')" label-for="petype-input" @keyup.enter.native="peSubmit">
                     <b-form-select id="ptype-input" v-model="editplantimetype" :options="plantimetypeoptions"></b-form-select>
                     <b-tooltip target="ptype-input" varient="light">{{ $t('timetypedescription') }}</b-tooltip>
                   </b-form-group>
@@ -149,7 +153,7 @@
         :cancel-title="$t('cancel')">
 
         <form ref="tform">
-
+          <input type="text" style="display:none;"/>
           <b-form-group
             :label="$t('tname')"
             label-for="tname-input"
@@ -159,13 +163,14 @@
               v-model="taskname"
               :placeholder="$t('ttaskname')"
               required
+              @keyup.enter.native="tSubmit"
             ></b-form-input>
           </b-form-group>
           <b-form-group
             :label="$t('ttime')"
             label-for="timeinput"
           >
-            <timepicker v-model="tasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></timepicker>
+            <timepicker v-model="tasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true" @keyup.enter.native="tSubmit"></timepicker>
           </b-form-group>
           <b-form-group :label="$t('tmore')">
             <b-form-checkbox
@@ -188,6 +193,7 @@
         :ok-title="$t('submit')"
         :cancel-title="$t('cancel')">
         <form ref="eform">
+          <input type="text" style="display:none;"/>
           <b-form-group
             :label="$t('tname')"
             label-for="ename-input"
@@ -196,13 +202,14 @@
               id="ename-input"
               v-model="edittaskname"
               required
+              @keyup.enter.native="eSubmit"
             ></b-form-input>
           </b-form-group>
           <b-form-group
             :label="$t('ttime')"
             label-for="etimeinput"
           >
-            <timepicker v-model="edittasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></timepicker>
+            <timepicker v-model="edittasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true" @keyup.enter.native="eSubmit"></timepicker>
           </b-form-group>
         </form>
       </b-modal>
@@ -223,6 +230,7 @@
         :ok-title="$t('submit')"
         :cancel-title="$t('cancel')">
         <form ref="eform">
+          <input type="text" style="display:none;"/>
           <b-form-group
             :label="$t('tname')"
             label-for="oename-input"
@@ -231,13 +239,14 @@
               id="oename-input"
               v-model="onceedittaskname"
               required
+              @keyup.enter.native="onceeSubmit"
             ></b-form-input>
           </b-form-group>
           <b-form-group
             :label="$t('ttime')"
             label-for="oetimeinput"
           >
-            <timepicker v-model="onceedittasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></timepicker>
+            <timepicker v-model="onceedittasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true" @keyup.enter.native="onceeSubmit"></timepicker>
           </b-form-group>
         </form>
       </b-modal>
@@ -609,6 +618,7 @@
         {
            // Push the name to submitted names
           this.loading = true;
+          this.$refs['tmodal'].hide();
           if(this.isonce == 'once') {
             if(this.islogin == true) {
               var otask = new Oncetask();
@@ -670,6 +680,7 @@
       pSubmit() {
         if(this.planname != ''){
           this.loading = true;
+          this.$refs['pmodal'].hide();
           if(this.islogin) {
             var plan = new Plan();
             plan.set('name', this.planname);
@@ -755,6 +766,7 @@
         this.loading = true;
         if(this.edittasktime != '' && this.edittaskname != '')
         {
+          this.$refs['emodal'].hide();
            // Push the name to submitted names
           this.plans[this.i_thisplan].tasks.map((item, index) => {
             if (item.index == this.edittaskindex)
@@ -904,6 +916,7 @@
       },
       onceeSubmit() {
         this.loading = true;
+        this.$refs['oemodal'].hide();
         if(this.onceedittasktime != '' && this.onceedittaskname != '')
         {
           if(this.islogin) {
