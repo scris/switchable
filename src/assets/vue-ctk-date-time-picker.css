@@ -8,7 +8,7 @@
 	font-size: 13px;
 	outline: none;
 	cursor: pointer;
-	-webkit-transition: all .25s cubic-bezier(.645,.045,.355,1);
+	transition: all .25s cubic-bezier(.645,.045,.355,1);
 	color: #fff;
 	letter-spacing: 0.15rem;
 }
@@ -816,7 +816,7 @@
 	font-size: 14px;
 	outline: none;
 	cursor: pointer;
-	-webkit-transition: all .25s cubic-bezier(.645,.045,.355,1);
+	transition: all .25s cubic-bezier(.645,.045,.355,1);
 	color: #fff;
 	font-weight: 500
 }
@@ -1101,7 +1101,7 @@
 	-moz-box-align: stretch;
 	-moz-box-pack: justify;
 	-webkit-box-pack: justify;
-	-webkit-justify-content: space-between;
+	justify-content: space-between;
 	-webkit-box-align: stretch
 }
 

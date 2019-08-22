@@ -165,7 +165,7 @@
             :label="$t('ttime')"
             label-for="timeinput"
           >
-            <VueCtkDateTimePicker v-model="tasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></VueCtkDateTimePicker>
+            <timepicker v-model="tasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></timepicker>
           </b-form-group>
           <b-form-group :label="$t('tmore')">
             <b-form-checkbox
@@ -202,7 +202,7 @@
             :label="$t('ttime')"
             label-for="etimeinput"
           >
-            <VueCtkDateTimePicker v-model="edittasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></VueCtkDateTimePicker>
+            <timepicker v-model="edittasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></timepicker>
           </b-form-group>
         </form>
       </b-modal>
@@ -237,7 +237,7 @@
             :label="$t('ttime')"
             label-for="oetimeinput"
           >
-            <VueCtkDateTimePicker v-model="onceedittasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></VueCtkDateTimePicker>
+            <timepicker v-model="onceedittasktime" :only-time="true" format="HH:mm" formatted="HH:mm" :inline="false" :label="$t('selecttime')" color="darkred" :noClearButton="true" :noLabel="true"></timepicker>
           </b-form-group>
         </form>
       </b-modal>
@@ -326,10 +326,10 @@
 <script>
   import AV from 'leancloud-storage';
   import notify from '@/components/linxf/notify';
-  import Loading from 'vue-loading-overlay';
+  import loading from 'vue-loading-overlay';
   import 'vue-loading-overlay/dist/vue-loading.css';
   import { Plugins } from '@capacitor/core';
-  import VueCtkDateTimePicker from 'vue-ctk-date-time-picker';
+  import timepicker from 'vue-ctk-date-time-picker';
   import '@/assets/vue-ctk-date-time-picker.css';
   const { Storage } = Plugins;
   var Plan = AV.Object.extend('switchable_plans');
@@ -339,8 +339,8 @@
   export default {
     name: 'switchable',
     components: {
-      Loading,
-      VueCtkDateTimePicker,
+      loading,
+      timepicker,
     },
     data() {
       return {
