@@ -216,13 +216,14 @@ export default {
       var that = this;
       this.plans.map((item, index) => {
         var plan = new Plan();
+        item.newid = item.id;
         plan.set('name', item.name);
         plan.set('tasks',item.tasks)
         plan.set('type', item.type);
         plan.set('user', AV.User.current());
         plan.set('index', item.index);
         plan.save().then(function (pl) {
-          
+          item.newid = pl.id;
         }, function (error) {
           alert(error.rawMessage);
         });
@@ -232,6 +233,11 @@ export default {
         oncetask.set('name', item.name);
         oncetask.set('time', item.time);
         oncetask.set('finished',item.finished)
+        this.plans.map((itemp, indexp) => {
+          if(itemp.id.toString() == item.plan.toString()) {
+            item.plan = itemp.newid;
+          }
+        });
         oncetask.set('plan', item.plan.toString());
         oncetask.set('user', AV.User.current());
         oncetask.save().then(function (pl) {

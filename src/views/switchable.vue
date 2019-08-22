@@ -429,6 +429,7 @@
       {
         this.islogin = true;
         this.sync();
+        this.deleteoutdatedoncetasks();
         this.loading = false;
       } else {
         this.islogin = false;
@@ -526,7 +527,6 @@
             });
           }
         }, 60000);
-        that.deleteoutdatedoncetasks();
       },
       logout() {
         var that = this;
@@ -578,7 +578,7 @@
         if(keys.keys.indexOf('oncetask') != -1) {
           const sotask = await Storage.get({ key:'oncetask' })
           this.oncetask = JSON.parse(sotask.value);
-          this.sortonceasks();
+          this.sortoncetasks();
         } else {
           this.oncetask = [];
         }
@@ -636,7 +636,7 @@
                   id: ot.id,
                   plan: that.thisplanid,
                 });
-                that.sortonceasks();
+                that.sortoncetasks();
               }, function (error) {
                 alert(error.rawMessage);
               });
@@ -648,7 +648,7 @@
                 id: new Date().getTime(),
                 plan: this.thisplanid,
               });
-              this.sortonceasks();
+              this.sortoncetasks();
               this.storagesetjson('oncetask',this.oncetask);
             }
           } else {
@@ -916,9 +916,9 @@
       },
       onceeSubmit() {
         this.loading = true;
-        this.$refs['oemodal'].hide();
         if(this.onceedittasktime != '' && this.onceedittaskname != '')
         {
+          this.$refs['oemodal'].hide();
           if(this.islogin) {
             var eo_task = AV.Object.createWithoutData('switchable_oncetasks', this.onceedittaskid);
             eo_task.set('name', this.onceedittaskname);
@@ -938,7 +938,15 @@
             });
             this.loading = false;
           } else {
-            this.storagesetjson('oncetask',this.oncetask);
+            this.oncetask.map((item, index) => {
+              if (item.id == this.onceedittaskid)
+              {
+                item.name = this.onceedittaskname;
+                item.time = this.onceedittasktime;
+              }
+            })
+            this.sortoncetasks();
+            this.loading = false;
           }
         }
         else
@@ -965,7 +973,9 @@
               alert(error.rawMessage);
           });
         } else {
-          this.storagesetjson('oncetask',this.oncetask);
+          this.oncetask = this.oncetask.filter(ot => {
+            return ot.id != this.oncedeletetaskid;
+          });
         }
         this.loading = false;
       },
@@ -973,14 +983,16 @@
         this.oncedeletetaskid = did;
       },
       deleteoutdatedoncetasks() {
+        console.log(JSON.stringify(this.oncetask))
         this.oncetask.map((item,index) => {
           if(item.finished == true) {
             this.oncedeleter(item.id);
           }
         })
-        this.oncetask = this.oncetask.filter(ot => {
-          return ot.finished != true;
-        })
+        this.oncetask = this.oncetask.filter(this.filterfn);
+      },
+      filterfn(ot) {
+        return ot.finished != true;
       },
       oncedeleter(id) {
         if(this.islogin) {
@@ -995,7 +1007,7 @@
           this.storagesetjson('oncetask',this.oncetask);
         }
       },
-      sortonceasks() {
+      sortoncetasks() {
         this.oncetask.sort((a,b) => {
           return a.time > b.time;
         })
