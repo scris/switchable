@@ -344,6 +344,7 @@
   var Plan = AV.Object.extend('switchable_plans');
   var Oncetask = AV.Object.extend('switchable_oncetasks');
   var alarm = new Audio();
+  var _this = null;
   alarm.src = require("@/assets/alarm.mp3");
   export default {
     name: 'switchable',
@@ -425,6 +426,7 @@
         this.iselectron = true;
       }
       this.isonios = this.isiOS(navigator.userAgent);
+      _this = this;
       if(AV.User.current())
       {
         this.islogin = true;
@@ -433,7 +435,9 @@
         this.loading = false;
       } else {
         this.islogin = false;
-        this.storagegetdata();
+        this.storagegetdata().then(function () {
+          _this.deleteoutdatedoncetasks();
+        });
         this.loading = false;
       }
       this.setintervals();
@@ -552,20 +556,20 @@
         const keys = await Storage.keys();
         if(keys.keys.indexOf('lang') != -1) {
           const retlang = await Storage.get({ key:'lang' });
-          if(retlang.value != null) this.lang = retlang.value;
-          else this.lang = 'en', this.storagesetlang('en');
-        } else this.lang = 'en', this.storagesetlang('en');
-        this.$i18n.locale = this.lang;
+          if(retlang.value != null) _this.lang = retlang.value;
+          else _this.lang = 'en', _this.storagesetlang('en');
+        } else _this.lang = 'en', _this.storagesetlang('en');
+        _this.$i18n.locale = _this.lang;
       },
       async storagegetdata() {
         const keys = await Storage.keys();
         if(keys.keys.indexOf('plan') != -1) {
           const splan = await Storage.get({ key:'plan' })
-          this.plans = JSON.parse(splan.value);
-          this.sorttasks();
-          this.chooseplan(this.plans[0].name)
+          _this.plans = JSON.parse(splan.value);
+          _this.sorttasks();
+          _this.chooseplan(_this.plans[0].name)
         } else {
-          this.plans = [{
+          _this.plans = [{
             id: new Date().getTime(),
             name: 'Plan 1',
             index: 1,
@@ -573,14 +577,14 @@
             type: 'absolute',
             user: 'local',
           }];
-          this.chooseplan('Plan 1');
+          _this.chooseplan('Plan 1');
         }
         if(keys.keys.indexOf('oncetask') != -1) {
           const sotask = await Storage.get({ key:'oncetask' })
-          this.oncetask = JSON.parse(sotask.value);
-          this.sortoncetasks();
+          _this.oncetask = JSON.parse(sotask.value);
+          _this.sortoncetasks();
         } else {
-          this.oncetask = [];
+          _this.oncetask = [];
         }
       },
       i18nchinese() {
