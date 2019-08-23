@@ -431,7 +431,7 @@
       if(AV.User.current())
       {
         this.islogin = true;
-        this.sync();
+        this.newsync();
         this.deleteoutdatedoncetasks();
         this.loading = false;
       } else {
@@ -457,6 +457,7 @@
         return this.isiPad(userAgent) || this.isiPhone(userAgent);
       },
       sync() {
+        /*
         var oque = new AV.Query('switchable_oncetasks');
         oque.equalTo('user',AV.User.current());
         oque.ascending('time');
@@ -499,7 +500,10 @@
           that.loading = false;
         }, function (error) {
           alert(error.rawMessage);
-        })
+        })*/
+      },
+      newsync() {
+
       },
       gologin() {
         this.$router.push('/login');
@@ -631,6 +635,7 @@
           this.$refs['tmodal'].hide();
           if(this.isonce == 'once') {
             if(this.islogin == true) {
+              /*
               var otask = new Oncetask();
               otask.set('name', this.taskname);
               otask.set('time', this.tasktime);
@@ -649,18 +654,17 @@
                 that.sortoncetasks();
               }, function (error) {
                 alert(error.rawMessage);
-              });
-            } else {
-              this.oncetask.push({
-                name: this.taskname,
-                time: this.tasktime,
-                finished: false,
-                id: new Date().getTime(),
-                plan: this.thisplantoken,
-              });
-              this.sortoncetasks();
-              this.storagesetjson('oncetask',this.oncetask);
+              });*/
             }
+            this.oncetask.push({
+              name: this.taskname,
+              time: this.tasktime,
+              finished: false,
+              id: new Date().getTime(),
+              plan: this.thisplantoken,
+            });
+            this.sortoncetasks();
+            this.storagesetjson('oncetask',this.oncetask);
           } else {
             this.plans[this.i_thisplan].tasks.push({
               name: this.taskname,
@@ -692,6 +696,7 @@
           this.loading = true;
           this.$refs['pmodal'].hide();
           if(this.islogin) {
+            /*
             var plan = new Plan();
             plan.set('name', this.planname);
             plan.set('tasks', []);
@@ -713,24 +718,21 @@
             }, function (error) {
               alert(error.rawMessage);
               that.loading = false;
-            });
-          } else {
-            var gettime = new Date().getTime();
-            this.plans.push({
-              id: gettime,
-              token: gettime,
-              name: this.planname,
-              tasks: [],
-              index: 1,
-              type: this.plantimetype,
-            });
-            this.chooseplan(this.planname);
-            this.storagesetjson('plan',this.plans);
-            this.loading = false;
+            });*/
           }
-        }
-        else
-        {
+          var gettime = new Date().getTime();
+          this.plans.push({
+            id: gettime,
+            token: gettime,
+            name: this.planname,
+            tasks: [],
+            index: 1,
+            type: this.plantimetype,
+          });
+          this.chooseplan(this.planname);
+          this.storagesetjson('plan',this.plans);
+          this.loading = false;
+        } else {
           this.$refs['fnmodal'].show();
         }
       },
@@ -744,6 +746,7 @@
         this.loading = true;
         if(this.editplanname != '') {
           if(this.islogin) {
+            /*
             var plan = AV.Object.createWithoutData('switchable_plans', this.plans[this.i_editplan].id);
             plan.set('name', this.editplanname);
             plan.set('type', this.editplantimetype);
@@ -754,13 +757,12 @@
               if(that.i_thisplan == that.i_editplan) that.chooseplan(that.editplanname, that.starttime_bool);
             }, function (error) {
               alert(error.rawMessage);
-            });
-          } else {
-            this.plans[this.i_editplan].name = this.editplanname;
-            this.plans[this.i_editplan].type = this.editplantimetype;
-            if(this.i_thisplan == this.i_editplan) this.chooseplan(this.editplanname, this.starttime_bool);
-            this.storagesetjson('plan',this.plans);
+            });*/
           }
+          this.plans[this.i_editplan].name = this.editplanname;
+          this.plans[this.i_editplan].type = this.editplantimetype;
+          if(this.i_thisplan == this.i_editplan) this.chooseplan(this.editplanname, this.starttime_bool);
+          this.storagesetjson('plan',this.plans);
         }
         else
         {
@@ -827,6 +829,7 @@
         this.loading = true;
         if(this.plans.length > 1){
           if(this.islogin) {
+            /*
             var deleteplan = AV.Object.createWithoutData('switchable_plans', this.plans[this.i_editplan].id);
             var that = this;
             deleteplan.destroy().then(function (success) {
@@ -846,24 +849,23 @@
               that.pmbvisibility = false;
             }, function (error) {
               alert(error.rawMessage);
-            });
-          } else {
-            this.plans = this.plans.filter(dplan => {
-              return dplan.id !== this.editplanid;
-            });
-            if(this.i_editplan == this.i_thisplan) {
-              this.thisplan = this.plans[0].tasks;
-              this.thisplanname = this.plans[0].name;
-              this.thisplanid = this.plans[0].id;
-              this.thisplantoken = this.plans[0].token;
-              this.thisplanindex = this.plans[0].index;
-              this.i_thisplan = 0;
-            } else {
-              this.chooseplan(this.thisplanname, this.starttime_bool);
-            }
-            this.pmbvisibility = false;
-            this.storagesetjson('plan',this.plans);
+            });*/
           }
+          this.plans = this.plans.filter(dplan => {
+            return dplan.id !== this.editplanid;
+          });
+          if(this.i_editplan == this.i_thisplan) {
+            this.thisplan = this.plans[0].tasks;
+            this.thisplanname = this.plans[0].name;
+            this.thisplanid = this.plans[0].id;
+            this.thisplantoken = this.plans[0].token;
+            this.thisplanindex = this.plans[0].index;
+            this.i_thisplan = 0;
+          } else {
+            this.chooseplan(this.thisplanname, this.starttime_bool);
+          }
+          this.pmbvisibility = false;
+          this.storagesetjson('plan',this.plans);
         } else {
           this.$refs['lmnmodal'].show();
         }
@@ -890,6 +892,7 @@
       //modal(g) end
       taskUpdater() {
         if(this.islogin) {
+          /*
           var u_task = AV.Object.createWithoutData('switchable_plans', this.thisplanid);
           u_task.set('tasks', this.thisplan);
           this.thisplanindex ++;
@@ -898,10 +901,9 @@
             
           }, function (error) {
             alert(error.rawMessage);
-          });
-        } else {
-          this.storagesetjson('plan',this.plans);
+          });*/
         }
+        this.storagesetjson('plan',this.plans);
       },
       planModify(iid) {
         this.plans.map((item, index) => {
@@ -911,7 +913,6 @@
             this.i_editplan = index;
             this.editplanname = item.name;
             this.editplanid = item.id;
-            
             this.editplantimetype = item.type;
           }
         })
@@ -919,16 +920,16 @@
       oncefinish(index) {
         this.oncetask[index].finished = true;
         if(this.islogin) {
+          /*
           var eo_task = AV.Object.createWithoutData('switchable_oncetasks', this.oncetask[index].id);
           eo_task.set('finished', true);
           eo_task.save().then(function() {
             
           }, function (error) {
             alert(error.rawMessage);
-          });
-        } else {
-          this.storagesetjson('oncetask',this.oncetask);
+          });*/
         }
+        this.storagesetjson('oncetask',this.oncetask);
       },
       onceeSubmit() {
         this.loading = true;
@@ -936,6 +937,7 @@
         {
           this.$refs['oemodal'].hide();
           if(this.islogin) {
+            /*
             var eo_task = AV.Object.createWithoutData('switchable_oncetasks', this.onceedittaskid);
             eo_task.set('name', this.onceedittaskname);
             eo_task.set('time', this.onceedittasktime);
@@ -951,19 +953,17 @@
               that.sortoncetasks();
             }, function (error) {
               alert(error.rawMessage);
-            });
-            this.loading = false;
-          } else {
-            this.oncetask.map((item, index) => {
-              if (item.id == this.onceedittaskid)
-              {
-                item.name = this.onceedittaskname;
-                item.time = this.onceedittasktime;
-              }
-            })
-            this.sortoncetasks();
-            this.loading = false;
+            });*/
           }
+          this.oncetask.map((item, index) => {
+            if (item.id == this.onceedittaskid)
+            {
+              item.name = this.onceedittaskname;
+              item.time = this.onceedittasktime;
+            }
+          })
+          this.sortoncetasks();
+          this.loading = false;
         }
         else
         {
@@ -979,6 +979,7 @@
       oncedSubmit() {
         this.loading = true;
         if(this.islogin) {
+          /*
           var eod_task = AV.Object.createWithoutData('switchable_oncetasks', this.oncedeletetaskid);
           var that = this;
           eod_task.destroy().then(function (success) {
@@ -987,12 +988,11 @@
               });
           }, function (error) {
               alert(error.rawMessage);
-          });
-        } else {
-          this.oncetask = this.oncetask.filter(ot => {
-            return ot.id != this.oncedeletetaskid;
-          });
+          });*/
         }
+        this.oncetask = this.oncetask.filter(ot => {
+          return ot.id != this.oncedeletetaskid;
+        });
         this.loading = false;
       },
       oncedNew(did) {
@@ -1012,16 +1012,16 @@
       },
       oncedeleter(id) {
         if(this.islogin) {
+          /*
           var eod_task = AV.Object.createWithoutData('switchable_oncetasks', id);
           var that = this;
           eod_task.destroy().then(function (success) {
 
           }, function (error) {
               alert(error.rawMessage);
-          });
-        } else {
-          this.storagesetjson('oncetask',this.oncetask);
+          });*/
         }
+        this.storagesetjson('oncetask',this.oncetask);
       },
       sortoncetasks() {
         this.oncetask.sort((a,b) => {
