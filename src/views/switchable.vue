@@ -31,8 +31,8 @@
       <div id="notifies" style="-webkit-app-region: no-drag">
         <div v-if="oncetask.length">
           <div class="linediv notify" v-for="task in oncetask" :key="task.id">
-            <div class="notifypane" v-if="task.plan == thisplanid"><span class="notifyname" v-bind:class="{ finishedoncetask: task.finished }">{{ task.name }}</span>&nbsp;<small class="text-muted once" v-if="!task.finished">{{ $t('tonce') }}</small><small class="text-muted once" v-if="task.finished">{{ $t('finishedoncetask') }}</small></div>
-            <div class="notifypane" v-if="task.plan == thisplanid">
+            <div class="notifypane" v-if="task.plan == thisplantoken"><span class="notifyname" v-bind:class="{ finishedoncetask: task.finished }">{{ task.name }}</span>&nbsp;<small class="text-muted once" v-if="!task.finished">{{ $t('tonce') }}</small><small class="text-muted once" v-if="task.finished">{{ $t('finishedoncetask') }}</small></div>
+            <div class="notifypane" v-if="task.plan == thisplantoken">
               <span class="notifytime" v-bind:class="{ finishedoncetask: task.finished }">{{ task.time }}</span>
               <button class="notifymodify notifyedit bfa"  v-bind:class="{ finishedoncetask: task.finished }" @click="onceeNew(task.name,task.time,task.id)" v-b-modal.oncetaskedit>
                 <!-- bfa = button with font-awesome -->
@@ -361,6 +361,7 @@
         thisplantype: 'absolute',
         thisplanindex: 1,
         thisplanid: '0',
+        thisplantoken: '0',
         starttime: new Date(),
         starttime_bool: false,
         plans: [],
@@ -480,6 +481,7 @@
           results.forEach((pl) => {
             that.plans.push({
               id: pl.id,
+              token: pl.get("token"),
               name: pl.get("name"),
               index: pl.get("index"),
               tasks: pl.get("tasks"),
@@ -490,6 +492,7 @@
           that.thisplan = that.plans[0].tasks;
           that.thisplanname = that.plans[0].name;
           that.thisplanid = that.plans[0].id;
+          that.thisplantoken = that.plans[0].token;
           that.thisplanindex = that.plans[0].index;
           that.thisplantype = that.plans[0].type;
           that.sorttasks();
@@ -569,8 +572,10 @@
           _this.sorttasks();
           _this.chooseplan(_this.plans[0].name)
         } else {
+          var gettime = new Date().getTime();
           _this.plans = [{
-            id: new Date().getTime(),
+            id: gettime,
+            token: gettime,
             name: 'Plan 1',
             index: 1,
             tasks: [],
@@ -611,6 +616,7 @@
             this.thisplanname = item.name;
             this.thisplantype = item.type;
             this.thisplanid = item.id;
+            this.thisplantoken = item.token;
             this.thisplanindex = item.index;
           }
         })
@@ -630,7 +636,7 @@
               otask.set('time', this.tasktime);
               otask.set('finished', false);
               otask.set('user', AV.User.current());
-              otask.set('plan', this.thisplanid)
+              otask.set('plan', this.thisplantoken)
               var that = this;
               otask.save().then(function (ot) {
                 that.oncetask.push({
@@ -638,7 +644,7 @@
                   time: that.tasktime,
                   finished: false,
                   id: ot.id,
-                  plan: that.thisplanid,
+                  plan: that.thisplantoken,
                 });
                 that.sortoncetasks();
               }, function (error) {
@@ -650,7 +656,7 @@
                 time: this.tasktime,
                 finished: false,
                 id: new Date().getTime(),
-                plan: this.thisplanid,
+                plan: this.thisplantoken,
               });
               this.sortoncetasks();
               this.storagesetjson('oncetask',this.oncetask);
@@ -696,6 +702,7 @@
             plan.save().then(function (pl) {
               that.plans.push({
                 id: pl.id,
+                token: new Date().getTime(),
                 name: that.planname,
                 tasks: [],
                 index: 1,
@@ -708,8 +715,10 @@
               that.loading = false;
             });
           } else {
+            var gettime = new Date().getTime();
             this.plans.push({
-              id: new Date().getTime(),
+              id: gettime,
+              token: gettime,
               name: this.planname,
               tasks: [],
               index: 1,
@@ -828,6 +837,7 @@
                 that.thisplan = that.plans[0].tasks;
                 that.thisplanname = that.plans[0].name;
                 that.thisplanid = that.plans[0].id;
+                that.thisplantoken = that.plans[0].token;
                 that.thisplanindex = that.plans[0].index;
                 that.i_thisplan = 0;
               } else {
@@ -845,6 +855,7 @@
               this.thisplan = this.plans[0].tasks;
               this.thisplanname = this.plans[0].name;
               this.thisplanid = this.plans[0].id;
+              this.thisplantoken = this.plans[0].token;
               this.thisplanindex = this.plans[0].index;
               this.i_thisplan = 0;
             } else {
@@ -900,6 +911,7 @@
             this.i_editplan = index;
             this.editplanname = item.name;
             this.editplanid = item.id;
+            
             this.editplantimetype = item.type;
           }
         })
