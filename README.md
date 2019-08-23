@@ -1,7 +1,13 @@
-## Scris Switchable
 
-> Create amount of daily plans, then quickly switch from one to another.
-> License: MPL v2.0
+![Switchable Repo Banner](https://i.loli.net/2019/08/23/RfVzYBXqv6N5mOx.png)
+
+### What is it
+
+Create amount of daily plans, then quickly switch from one to another.
+
+### License
+
+MPL v2.0
 
 ### Before Build
 
