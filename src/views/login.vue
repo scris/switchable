@@ -213,6 +213,7 @@ export default {
       this.confirmlogin = true;
     },
     nsulogin() {
+      /*
       var that = this;
       this.plans.map((item, index) => {
         var plan = new Plan();
@@ -248,7 +249,7 @@ export default {
         }, function (error) {
           alert(error.rawMessage);
         });
-      });
+      });*/
     },
     whenlogin() {
       this.conflictsolver();
