@@ -402,6 +402,7 @@
         lang: 'en',
         version: '1.0.0',
         oncetask: [],
+        anchor: -1,
       };
     },
     watch: {
@@ -502,6 +503,9 @@
           alert(error.rawMessage);
         })*/
       },
+      time() {
+        return (new Date()).valueOf();
+      },
       newsync() {
 
       },
@@ -584,7 +588,8 @@
             index: 1,
             tasks: [],
             type: 'absolute',
-            user: 'local',
+            status: 0,
+            modified: _this.time(),
           }];
           _this.chooseplan('Plan 1');
         }
@@ -662,6 +667,8 @@
               finished: false,
               id: new Date().getTime(),
               plan: this.thisplantoken,
+              status: 0,
+              modified: this.time(),
             });
             this.sortoncetasks();
             this.storagesetjson('oncetask',this.oncetask);
@@ -671,6 +678,8 @@
               time: this.tasktime,
               index: this.plans[this.i_thisplan].index,
             });
+            if(this.plans[this.i_thisplan].status == 9) this.plans[this.i_thisplan].status = 0;
+            this.plans[this.i_thisplan].modified = this.time();
             this.thisplan = this.plans[this.i_thisplan].tasks;
             this.plans[this.i_thisplan].index ++;
             this.taskUpdater();
@@ -728,6 +737,8 @@
             tasks: [],
             index: 1,
             type: this.plantimetype,
+            status: 0,
+            modified: this.time(),
           });
           this.chooseplan(this.planname);
           this.storagesetjson('plan',this.plans);
@@ -761,6 +772,8 @@
           }
           this.plans[this.i_editplan].name = this.editplanname;
           this.plans[this.i_editplan].type = this.editplantimetype;
+          if(this.plans[this.i_editplan].status == 9) this.plans[this.i_editplan].status = 0;
+          this.plans[this.i_editplan].modified = this.time();
           if(this.i_thisplan == this.i_editplan) this.chooseplan(this.editplanname, this.starttime_bool);
           this.storagesetjson('plan',this.plans);
         }
@@ -790,6 +803,8 @@
               item.time = this.edittasktime;
             }
           });
+          if(this.plans[this.i_thisplan].status == 9) this.plans[this.i_thisplan].status = 0;
+          this.plans[this.i_thisplan].modified = this.time();
           this.thisplan = this.plans[this.i_thisplan].tasks;
           this.taskUpdater();
           this.sortthistasks();
@@ -816,6 +831,8 @@
         });
         this.thisplan = this.plans[this.i_thisplan].tasks;
         this.plans[this.i_thisplan].index --;
+        if(this.plans[this.i_thisplan].status == 9) this.plans[this.i_thisplan].status = 0;
+        this.plans[this.i_thisplan].modified = this.time();
         this.taskUpdater();
         this.loading = false;
       },
@@ -851,6 +868,9 @@
               alert(error.rawMessage);
             });*/
           }
+          this.plans[this.i_editplan].status = -1;
+          this.plans[this.i_editplan].modified = this.time();
+          this.newsync();
           this.plans = this.plans.filter(dplan => {
             return dplan.id !== this.editplanid;
           });
@@ -918,7 +938,8 @@
         })
       },
       oncefinish(index) {
-        this.oncetask[index].finished = true;
+        if(this.oncetask[index].status == 9) this.oncetask[index].status = 0;
+        this.oncetask[index].modified = this.time();
         if(this.islogin) {
           /*
           var eo_task = AV.Object.createWithoutData('switchable_oncetasks', this.oncetask[index].id);
@@ -935,6 +956,8 @@
         this.loading = true;
         if(this.onceedittasktime != '' && this.onceedittaskname != '')
         {
+          if(this.oncetask[index].status == 9) this.oncetask[index].status = 0;
+          this.oncetask[index].modified = this.time();
           this.$refs['oemodal'].hide();
           if(this.islogin) {
             /*
@@ -990,6 +1013,9 @@
               alert(error.rawMessage);
           });*/
         }
+        this.oncetask[index].status = -1;
+        this.oncetask[index].modified = this.time();
+        this.newsync();
         this.oncetask = this.oncetask.filter(ot => {
           return ot.id != this.oncedeletetaskid;
         });
