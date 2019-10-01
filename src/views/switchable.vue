@@ -403,6 +403,7 @@
         version: '1.0.0',
         oncetask: [],
         anchor: -1,
+        iffetch: 0,
       };
     },
     watch: {
@@ -432,6 +433,7 @@
       if(AV.User.current())
       {
         this.islogin = true;
+        this.storagegetdata();
         this.newsync();
         this.deleteoutdatedoncetasks();
         this.loading = false;
@@ -503,18 +505,99 @@
           alert(error.rawMessage);
         })*/
       },
-      time() {
+      now() {
         return (new Date()).valueOf();
       },
       newsync() {
-
+        if(this.islogin) {
+          // plan
+          var that = this;
+          /*
+          var plantokens = [];
+          this.plans.map((item, index) => {
+            plantokens.push(item.token);
+          });
+          this.plans.map((item, index) => {
+            if (item.status < 9) {
+              if (item.status == 0) {
+                var newplan = new Plan();
+                newplan.set('index', item.index);
+                newplan.set('name', item.name);
+                newplan.set('type', item.type);
+                newplan.set('modified', item.modified);
+                newplan.set('anchor', this.now());
+                newplan.set('tasks', item.tasks);
+                newplan.set('token', item.token);
+                newplan.set('user', AV.User.current());
+                newplan.save().then(function (np) {
+                  that.plans[index].id = np.id;
+                  that.plans[index].status = 9;
+                }, function (error) {
+                  alert(error.rawMessage);
+                });
+              } else if (item.status == 1) {
+                var nquery = new AV.Query('switchable_plans');
+                nquery.equalTo('user',AV.User.current());
+                nquery.first().then(function (np) {
+                  var npmodified = np.get('modified');
+                  if (npmodified <= item.modified) {
+                    var updp = AV.Object.createWithoutData('switchable_plans', np.id);
+                    updp.set('index', item.index);
+                    updp.set('name', item.name);
+                    updp.set('type', item.type);
+                    updp.set('anchor', that.now());
+                    updp.set('tasks', item.tasks);
+                    updp.save();
+                    that.plans[index].status = 9;
+                  }
+                });
+              } else if (item.status == -1) {
+                var dltp = AV.Object.createWithoutData('switchable_plans', item.id);
+                dltp.destroy();
+              }
+            }
+          });
+          */
+          var pquery = new AV.Query('switchable_plans');
+          pquery.greaterThan('anchor', this.anchor);
+          pquery.find().then(function (qp) {
+            var indexof = plantokens.indexOf(qp.token);
+            if(indexof > -1) {
+              that.plans[indexof].index = qp.get("index");
+              that.plans[indexof].name = qp.get("name");
+              that.plans[indexof].type = qp.get("type");
+              that.plans[indexof].tasks = qp.get("tasks");
+              that.plans[indexof].modified = that.anchor;
+            } else {
+              that.plans.push({
+                id: qp.id,
+                token: qp.get("token"),
+                name: qp.get("name"),
+                tasks: qp.get("tasks"),
+                index: qp.get("index"),
+                type: qp.get("type"),
+                status: 9,
+                modified: that.anchor,
+              });
+            }
+          });
+          this.anchor = this.now();
+          this.plans = that.plans;
+          //this.storagesetjson('plan', this.plans);
+        } 
       },
       gologin() {
         this.$router.push('/login');
       },
       setintervals() {
+        this.iffetch = 0;
         var that = this;
         that.intervalid = setInterval(() => {
+          that.iffetch ++;
+          if(that.iffetch == 5) {
+            that.iffetch = 0;
+            that.newsync();
+          }
           let timeStamp = new Date();
           if(that.thisplantype == 'relative') timeStamp = new Date() - that.starttime;
           let hh = '00';
@@ -580,17 +663,44 @@
           _this.sorttasks();
           _this.chooseplan(_this.plans[0].name)
         } else {
-          var gettime = new Date().getTime();
-          _this.plans = [{
-            id: gettime,
-            token: gettime,
-            name: 'Plan 1',
-            index: 1,
-            tasks: [],
-            type: 'absolute',
-            status: 0,
-            modified: _this.time(),
-          }];
+          var getTime = new Date().getTime();
+          if(_this.islogin) {
+            var newplan = new Plan();
+            var planid = "";
+            newplan.set('index', 1);
+            newplan.set('name', 'Plan 1');
+            newplan.set('type', 'absolute');
+            newplan.set('modified', _this.now());
+            newplan.set('anchor', _this.now());
+            newplan.set('tasks', []);
+            newplan.set('token', getTime.toString());
+            newplan.set('user', AV.User.current());
+            newplan.save().then((np) => {
+              _this.plans = [{
+                id: np.id,
+                token: getTime.toString(),
+                name: 'Plan 1',
+                index: 1,
+                tasks: [],
+                type: 'absolute',
+                status: 9,
+                modified: _this.now(),
+              }];
+            }, function (error) {
+              alert(error.rawMessage);
+            });
+          } else {
+            _this.plans = [{
+              id: getTime,
+              token: getTime.toString(),
+              name: 'Plan 1',
+              index: 1,
+              tasks: [],
+              type: 'absolute',
+              status: 0,
+              modified: _this.now(),
+            }];
+          }
           _this.chooseplan('Plan 1');
         }
         if(keys.keys.indexOf('oncetask') != -1) {
@@ -668,7 +778,7 @@
               id: new Date().getTime(),
               plan: this.thisplantoken,
               status: 0,
-              modified: this.time(),
+              modified: this.now(),
             });
             this.sortoncetasks();
             this.storagesetjson('oncetask',this.oncetask);
@@ -678,12 +788,51 @@
               time: this.tasktime,
               index: this.plans[this.i_thisplan].index,
             });
-            if(this.plans[this.i_thisplan].status == 9) this.plans[this.i_thisplan].status = 0;
-            this.plans[this.i_thisplan].modified = this.time();
+            if(this.plans[this.i_thisplan].status == 9) this.plans[this.i_thisplan].status = 1;
+            this.plans[this.i_thisplan].modified = this.now();
             this.thisplan = this.plans[this.i_thisplan].tasks;
             this.plans[this.i_thisplan].index ++;
             this.taskUpdater();
             this.sortthistasks();
+            if(this.islogin) {
+              var item = this.plans[this.i_thisplan];
+              if(item.id.toString() == item.token) {
+                  var newplan = new Plan();
+                  var that = this;
+                  newplan.set('index', item.index);
+                  newplan.set('name', item.name);
+                  newplan.set('type', item.type);
+                  newplan.set('modified', that.now());
+                  newplan.set('anchor', that.now());
+                  newplan.set('tasks', item.tasks);
+                  newplan.set('token', item.token);
+                  newplan.set('user', AV.User.current());
+                  newplan.save().then((np) => {
+                    item.id = np.id;
+                    item.status = 9;
+                  }, function (error) {
+                    alert(error.rawMessage);
+                  });
+              } else {
+                var nquery = new AV.Query('switchable_plans');
+                nquery.equalTo('user',AV.User.current());
+                nquery.equalTo('token',this.plans[this.i_thisplan].token);
+                var that = this;
+                nquery.first().then((np) => {
+                  var npmodified = np.get('modified');
+                  if (npmodified <= item.modified) {
+                    var updp = AV.Object.createWithoutData('switchable_plans', np.id);
+                    updp.set('index', item.index);
+                    updp.set('anchor', that.now());
+                    updp.set('tasks', item.tasks);
+                    updp.set('modified', that.now());
+                    updp.save();
+                    item.status = 9;
+                  }
+                });
+              }
+              this.plans[this.i_thisplan] = item;
+            }
           }
           this.loading = false;
         }
@@ -702,49 +851,50 @@
       //modal(p) start
       pSubmit() {
         if(this.planname != ''){
-          this.loading = true;
-          this.$refs['pmodal'].hide();
-          if(this.islogin) {
-            /*
-            var plan = new Plan();
-            plan.set('name', this.planname);
-            plan.set('tasks', []);
-            plan.set('index', 1);
-            plan.set('type', this.plantimetype);
-            plan.set('user', AV.User.current());
-            var that = this;
-            plan.save().then(function (pl) {
-              that.plans.push({
-                id: pl.id,
-                token: new Date().getTime(),
-                name: that.planname,
-                tasks: [],
-                index: 1,
-                type: that.plantimetype,
-              });
-              that.chooseplan(that.planname);
-              that.loading = false;
-            }, function (error) {
-              alert(error.rawMessage);
-              that.loading = false;
-            });*/
-          }
-          var gettime = new Date().getTime();
-          this.plans.push({
-            id: gettime,
-            token: gettime,
-            name: this.planname,
-            tasks: [],
-            index: 1,
-            type: this.plantimetype,
-            status: 0,
-            modified: this.time(),
-          });
-          this.chooseplan(this.planname);
-          this.storagesetjson('plan',this.plans);
-          this.loading = false;
-        } else {
-          this.$refs['fnmodal'].show();
+            this.loading = true;
+            this.$refs['pmodal'].hide();
+            var getTime = new Date().getTime();
+              if(this.islogin) {
+                var newplan = new Plan();
+                var that = this;
+                var planid = "";
+                newplan.set('index', 1);
+                newplan.set('name', that.planname);
+                newplan.set('type', that.plantimetype);
+                newplan.set('modified', that.now());
+                newplan.set('anchor', that.now());
+                newplan.set('tasks', []);
+                newplan.set('token', getTime.toString());
+                newplan.set('user', AV.User.current());
+                newplan.save().then((np) => {
+                  this.plans.push({
+                    id: np.id,
+                    token: getTime.toString(),
+                    name: this.planname,
+                    tasks: [],
+                    index: 1,
+                    type: this.plantimetype,
+                    status: 9,
+                    modified: this.now(),
+                  });
+                }, function (error) {
+                  alert(error.rawMessage);
+                });
+              } else {
+                this.plans.push({
+                  id: getTime,
+                  token: getTime.toString(),
+                  name: this.planname,
+                  tasks: [],
+                  index: 1,
+                  type: this.plantimetype,
+                  status: 0,
+                  modified: this.now(),
+                });
+              }
+            this.chooseplan(this.planname);
+            this.storagesetjson('plan',this.plans);
+            this.loading = false;
         }
       },
       pNew() {
@@ -756,26 +906,53 @@
       peSubmit() {
         this.loading = true;
         if(this.editplanname != '') {
-          if(this.islogin) {
-            /*
-            var plan = AV.Object.createWithoutData('switchable_plans', this.plans[this.i_editplan].id);
-            plan.set('name', this.editplanname);
-            plan.set('type', this.editplantimetype);
-            var that = this;
-            plan.save().then(function (pl) {
-              that.plans[that.i_editplan].name = that.editplanname;
-              that.plans[that.i_editplan].type = that.editplantimetype;
-              if(that.i_thisplan == that.i_editplan) that.chooseplan(that.editplanname, that.starttime_bool);
-            }, function (error) {
-              alert(error.rawMessage);
-            });*/
-          }
           this.plans[this.i_editplan].name = this.editplanname;
           this.plans[this.i_editplan].type = this.editplantimetype;
-          if(this.plans[this.i_editplan].status == 9) this.plans[this.i_editplan].status = 0;
-          this.plans[this.i_editplan].modified = this.time();
+          if(this.plans[this.i_editplan].status == 9) this.plans[this.i_editplan].status = 1;
+          this.plans[this.i_editplan].modified = this.now();
           if(this.i_thisplan == this.i_editplan) this.chooseplan(this.editplanname, this.starttime_bool);
           this.storagesetjson('plan',this.plans);
+          if(this.islogin) {
+            var item = this.plans[this.i_editplan];
+            if(item.id.toString() == item.token) {
+                var newplan = new Plan();
+                var that = this;
+                newplan.set('index', item.index);
+                newplan.set('name', item.name);
+                newplan.set('type', item.type);
+                newplan.set('modified', that.now());
+                newplan.set('anchor', that.now());
+                newplan.set('tasks', item.tasks);
+                newplan.set('token', item.token);
+                newplan.set('user', AV.User.current());
+                newplan.save().then(function (np) {
+                  item.id = np.id;
+                  item.status = 9;
+                }, function (error) {
+                  alert(error.rawMessage);
+                });
+            } else {
+              var nquery = new AV.Query('switchable_plans');
+              nquery.equalTo('user',AV.User.current());
+              nquery.equalTo('token',this.plans[this.i_editplan].token);
+              var that = this;
+              nquery.first().then(function (np) {
+                var npmodified = np.get('modified');
+                if (npmodified <= item.modified) {
+                  var updp = AV.Object.createWithoutData('switchable_plans', np.id);
+                  updp.set('index', item.index);
+                  updp.set('name', item.name);
+                  updp.set('type', item.type);
+                  updp.set('anchor', that.now());
+                  updp.set('tasks', item.tasks);
+                  updp.set('modified', that.now());
+                  updp.save();
+                  item.status = 9;
+                }
+              });
+            }
+            this.plans[this.i_editplan] = item;
+          }
         }
         else
         {
@@ -803,11 +980,50 @@
               item.time = this.edittasktime;
             }
           });
-          if(this.plans[this.i_thisplan].status == 9) this.plans[this.i_thisplan].status = 0;
-          this.plans[this.i_thisplan].modified = this.time();
+          if(this.plans[this.i_thisplan].status == 9) this.plans[this.i_thisplan].status = 1;
+          this.plans[this.i_thisplan].modified = this.now();
           this.thisplan = this.plans[this.i_thisplan].tasks;
           this.taskUpdater();
           this.sortthistasks();
+          if(this.islogin) {
+            var item = this.plans[this.i_thisplan];
+            if(item.id.toString() == item.token) {
+                var newplan = new Plan();
+                var that = this;
+                newplan.set('index', item.index);
+                newplan.set('name', item.name);
+                newplan.set('type', item.type);
+                newplan.set('modified', that.now());
+                newplan.set('anchor', that.now());
+                newplan.set('tasks', item.tasks);
+                newplan.set('token', item.token);
+                newplan.set('user', AV.User.current());
+                newplan.save().then(function (np) {
+                  item.id = np.id;
+                  item.status = 9;
+                }, function (error) {
+                  alert(error.rawMessage);
+                });
+            } else {
+              var nquery = new AV.Query('switchable_plans');
+              nquery.equalTo('user',AV.User.current());
+              nquery.equalTo('token',this.plans[this.i_thisplan].token);
+              var that = this;
+              nquery.first().then(function (np) {
+                var npmodified = np.get('modified');
+                if (npmodified <= item.modified) {
+                  var updp = AV.Object.createWithoutData('switchable_plans', np.id);
+                  updp.set('index', item.index);
+                  updp.set('anchor', that.now());
+                  updp.set('tasks', item.tasks);
+                  updp.set('modified', that.now());
+                  updp.save();
+                  item.status = 9;
+                }
+              });
+            }
+            this.plans[this.i_thisplan] = item;
+          }
           this.loading = false;
         }
         else
@@ -831,9 +1047,50 @@
         });
         this.thisplan = this.plans[this.i_thisplan].tasks;
         this.plans[this.i_thisplan].index --;
-        if(this.plans[this.i_thisplan].status == 9) this.plans[this.i_thisplan].status = 0;
-        this.plans[this.i_thisplan].modified = this.time();
+        if(this.plans[this.i_thisplan].status == 9) this.plans[this.i_thisplan].status = 1;
+        this.plans[this.i_thisplan].modified = this.now();
         this.taskUpdater();
+          if(this.islogin) {
+            var item = this.plans[this.i_thisplan];
+            if(item.id.toString() == item.token) {
+                var newplan = new Plan();
+                var that = this;
+                newplan.set('index', item.index);
+                newplan.set('name', item.name);
+                newplan.set('type', item.type);
+                newplan.set('modified', that.now());
+                newplan.set('anchor', that.now());
+                newplan.set('tasks', item.tasks);
+                newplan.set('token', item.token);
+                newplan.set('user', AV.User.current());
+                newplan.save().then(function (np) {
+                  item.id = np.id;
+                  item.status = 9;
+                }, function (error) {
+                  alert(error.rawMessage);
+                });
+            } else {
+              var nquery = new AV.Query('switchable_plans');
+              nquery.equalTo('user',AV.User.current());
+              nquery.equalTo('token',this.plans[this.i_thisplan].token);
+              var that = this;
+              nquery.first().then(function (np) {
+                var npmodified = np.get('modified');
+                if (npmodified <= item.modified) {
+                  var updp = AV.Object.createWithoutData('switchable_plans', np.id);
+                  updp.set('index', item.index);
+                  updp.set('name', item.name);
+                  updp.set('type', item.type);
+                  updp.set('anchor', that.now());
+                  updp.set('tasks', item.tasks);
+                  updp.set('modified', that.now());
+                  updp.save();
+                  item.status = 9;
+                }
+              });
+            }
+            this.plans[this.i_thisplan] = item;
+          }
         this.loading = false;
       },
       dNew(dindex) {
@@ -845,6 +1102,10 @@
       pdSubmit() {
         this.loading = true;
         if(this.plans.length > 1){
+          if(this.islogin) {
+            var dltp = AV.Object.createWithoutData('switchable_plans', this.plans[this.i_editplan].id);
+            dltp.destroy();
+          }
           if(this.islogin) {
             /*
             var deleteplan = AV.Object.createWithoutData('switchable_plans', this.plans[this.i_editplan].id);
@@ -869,8 +1130,7 @@
             });*/
           }
           this.plans[this.i_editplan].status = -1;
-          this.plans[this.i_editplan].modified = this.time();
-          this.newsync();
+          this.plans[this.i_editplan].modified = this.now();
           this.plans = this.plans.filter(dplan => {
             return dplan.id !== this.editplanid;
           });
@@ -939,7 +1199,7 @@
       },
       oncefinish(index) {
         if(this.oncetask[index].status == 9) this.oncetask[index].status = 0;
-        this.oncetask[index].modified = this.time();
+        this.oncetask[index].modified = this.now();
         if(this.islogin) {
           /*
           var eo_task = AV.Object.createWithoutData('switchable_oncetasks', this.oncetask[index].id);
@@ -957,7 +1217,7 @@
         if(this.onceedittasktime != '' && this.onceedittaskname != '')
         {
           if(this.oncetask[index].status == 9) this.oncetask[index].status = 0;
-          this.oncetask[index].modified = this.time();
+          this.oncetask[index].modified = this.now();
           this.$refs['oemodal'].hide();
           if(this.islogin) {
             /*
@@ -1014,7 +1274,7 @@
           });*/
         }
         this.oncetask[index].status = -1;
-        this.oncetask[index].modified = this.time();
+        this.oncetask[index].modified = this.now();
         this.newsync();
         this.oncetask = this.oncetask.filter(ot => {
           return ot.id != this.oncedeletetaskid;
@@ -1025,7 +1285,6 @@
         this.oncedeletetaskid = did;
       },
       deleteoutdatedoncetasks() {
-        console.log(JSON.stringify(this.oncetask))
         this.oncetask.map((item,index) => {
           if(item.finished == true) {
             this.oncedeleter(item.id);
@@ -1065,7 +1324,7 @@
         this.plans[this.i_thisplan].tasks.sort((a,b) => {
           return a.time > b.time;
         })
-      }
-    },
+      },
+    }
   }
 </script>

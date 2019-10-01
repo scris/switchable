@@ -119,6 +119,9 @@ export default {
       this.$router.push('/');
       this.confirmlogin = false;
     },
+    now() {
+      return (new Date()).valueOf();
+    },
     reg() {
       var that = this;
       this.loading = true;
@@ -127,13 +130,6 @@ export default {
       user.setPassword(that.pwd);
       user.set('isUserOfSwitchable',true);
       user.signUp().then(function (loginedUser) {
-        var plan = new Plan();
-        plan.set('name', 'Default');
-        plan.set('tasks', []);
-        plan.set('index', 1);
-        plan.set('type', 'absolute');
-        plan.set('user', AV.User.current());
-        plan.save().then(function (pl) {
           if (process.env.VUE_APP_LINXF == 'capacitor') {
             cordova.plugins.notification.local.hasPermission(function (granted) {
               if (granted) {
@@ -158,10 +154,6 @@ export default {
           } else {
             that.whenlogin();
           } 
-        }, function (error) {
-          that.loading = false;
-          alert(error.rawMessage);
-        });
       }, (function (error) {
         that.loading = false;
         alert(error.rawMessage);
@@ -252,7 +244,8 @@ export default {
       });*/
     },
     whenlogin() {
-      this.conflictsolver();
+      //this.conflictsolver();
+      this.nsuintologin();
     },
     conflictsolver() {
       if(!AV.User.current().get('isUserOfSwitchable')) {
