@@ -771,15 +771,44 @@
                 alert(error.rawMessage);
               });*/
             }
-            this.oncetask.push({
-              name: this.taskname,
-              time: this.tasktime,
-              finished: false,
-              id: new Date().getTime(),
-              plan: this.thisplantoken,
-              status: 0,
-              modified: this.now(),
-            });
+              var getTime = new Date().getTime();
+              if(this.islogin) {
+                var newoncetask = new Oncetask();
+                newoncetask.set('index', 1);
+                newoncetask.set('name', this.taskname);
+                newoncetask.set('time', this.tasktime);
+                newoncetask.set('finished', false);
+                newoncetask.set('modified', this.now());
+                newoncetask.set('anchor', this.now());
+                newoncetask.set('plan', this.thisplantoken)
+                newoncetask.set('token', getTime.toString());
+                newoncetask.set('user', AV.User.current());
+                newoncetask.save().then((np) => {
+                  this.oncetask.push({
+                    name: this.taskname,
+                    time: this.tasktime,
+                    finished: false,
+                    id: np.id,
+                    plan: this.thisplantoken,
+                    status: 0,
+                    modified: this.now(),
+                    token: getTime.toString(),
+                  });
+                }, function (error) {
+                  alert(error.rawMessage);
+                });
+              } else {
+                this.oncetask.push({
+                  name: this.taskname,
+                  time: this.tasktime,
+                  finished: false,
+                  id: getTime,
+                  plan: this.thisplantoken,
+                  status: 0,
+                  modified: this.now(),
+                  token: getTime.toString(),
+                });
+              }
             this.sortoncetasks();
             this.storagesetjson('oncetask',this.oncetask);
           } else {
@@ -1053,31 +1082,30 @@
           if(this.islogin) {
             var item = this.plans[this.i_thisplan];
             if(item.id.toString() == item.token) {
-                var newplan = new Plan();
-                var that = this;
-                newplan.set('index', item.index);
-                newplan.set('name', item.name);
-                newplan.set('type', item.type);
-                newplan.set('modified', that.now());
-                newplan.set('anchor', that.now());
-                newplan.set('tasks', item.tasks);
-                newplan.set('token', item.token);
-                newplan.set('user', AV.User.current());
-                newplan.save().then(function (np) {
+                var newoncetask = new Oncetask();
+                newoncetask.set('index', item.index);
+                newoncetask.set('name', item.name);
+                newoncetask.set('type', item.type);
+                newoncetask.set('modified', that.now());
+                newoncetask.set('anchor', that.now());
+                newoncetask.set('tasks', item.tasks);
+                newoncetask.set('token', item.token);
+                newoncetask.set('user', AV.User.current());
+                newoncetask.save().then(function (np) {
                   item.id = np.id;
                   item.status = 9;
                 }, function (error) {
                   alert(error.rawMessage);
                 });
             } else {
-              var nquery = new AV.Query('switchable_plans');
+              var nquery = new AV.Query('switchable_oncetasks');
               nquery.equalTo('user',AV.User.current());
               nquery.equalTo('token',this.plans[this.i_thisplan].token);
               var that = this;
               nquery.first().then(function (np) {
                 var npmodified = np.get('modified');
                 if (npmodified <= item.modified) {
-                  var updp = AV.Object.createWithoutData('switchable_plans', np.id);
+                  var updp = AV.Object.createWithoutData('switchable_oncetasks', np.id);
                   updp.set('index', item.index);
                   updp.set('name', item.name);
                   updp.set('type', item.type);
@@ -1216,33 +1244,51 @@
         this.loading = true;
         if(this.onceedittasktime != '' && this.onceedittaskname != '')
         {
-          if(this.oncetask[index].status == 9) this.oncetask[index].status = 0;
-          this.oncetask[index].modified = this.now();
-          this.$refs['oemodal'].hide();
-          if(this.islogin) {
-            /*
-            var eo_task = AV.Object.createWithoutData('switchable_oncetasks', this.onceedittaskid);
-            eo_task.set('name', this.onceedittaskname);
-            eo_task.set('time', this.onceedittasktime);
-            var that = this;
-            eo_task.save().then(function() {
-              that.oncetask.map((item, index) => {
-                if (item.id == that.onceedittaskid)
-                {
-                  item.name = that.onceedittaskname;
-                  item.time = that.onceedittasktime;
-                }
-              })
-              that.sortoncetasks();
-            }, function (error) {
-              alert(error.rawMessage);
-            });*/
-          }
           this.oncetask.map((item, index) => {
             if (item.id == this.onceedittaskid)
             {
               item.name = this.onceedittaskname;
               item.time = this.onceedittasktime;
+              if(item.status == 9) item.status = 0;
+              item.modified = this.now();
+              this.$refs['oemodal'].hide();
+              if(item.id.toString() == item.token) {
+                var newoncetask = new Oncetask();
+                var that = this;
+                newoncetask.set('name', item.name);
+                newoncetask.set('time', item.time);
+                newoncetask.set('finished', item.finished);
+                newoncetask.set('modified', that.now());
+                newoncetask.set('anchor', that.now());
+                newoncetask.set('plan', item.plan);
+                newoncetask.set('token', item.token);
+                newoncetask.set('user', AV.User.current());
+                newoncetask.save().then((np) => {
+                  item.id = np.id;
+                  item.status = 9;
+                }, function (error) {
+                  alert(error.rawMessage);
+                });
+              } else {
+                var nquery = new AV.Query('switchable_oncetasks');
+                nquery.equalTo('user',AV.User.current());
+                nquery.equalTo('token',item.token);
+                var that = this;
+                nquery.first().then((np) => {
+                  var npmodified = np.get('modified');
+                  if (npmodified <= item.modified) {
+                    var updp = AV.Object.createWithoutData('switchable_oncetasks', np.id);
+                    updp.set('time', item.time);
+                    updp.set('name', item.name);
+                    updp.set('finished', item.finished);
+                    updp.set('anchor', that.now());
+                    updp.set('modified', that.now());
+                    updp.save();
+                    item.status = 9;
+                  }
+                });
+              }
+              
             }
           })
           this.sortoncetasks();
@@ -1273,9 +1319,10 @@
               alert(error.rawMessage);
           });*/
         }
-        this.oncetask[index].status = -1;
-        this.oncetask[index].modified = this.now();
-        this.newsync();
+        if(this.islogin) {
+          var dltot = AV.Object.createWithoutData('switchable_oncetasks', this.oncedeletetaskid);
+          dltot.destroy();
+        }
         this.oncetask = this.oncetask.filter(ot => {
           return ot.id != this.oncedeletetaskid;
         });
