@@ -419,3 +419,7 @@ small.once {
 .text-muted-icon {
     color: #454b4e;
 }
+
+.notaskleft {
+    color: grey;
+}

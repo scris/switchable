@@ -29,6 +29,16 @@
       </div>
       
       <div id="notifies" style="-webkit-app-region: no-drag">
+        <div v-if="(oncetask.length == 0) && (thisplan.length == 0)">
+          <div class="linediv notify">
+            <div class="notifypane notaskleft">
+              {{ $t('notaskleft1') }}<br>
+              {{ $t('notaskleft2') }}
+              <i class="fa fa-plus"></i>
+              {{ $t('notaskleft3') }}
+            </div>
+          </div>
+        </div>
         <div v-if="oncetask.length">
           <div class="linediv notify" v-for="task in oncetask" :key="task.id">
             <div class="notifypane" v-if="task.plan == thisplantoken"><span class="notifyname" v-bind:class="{ finishedoncetask: task.finished }">{{ task.name }}</span>&nbsp;<small class="text-muted once" v-if="!task.finished">{{ $t('tonce') }}</small><small class="text-muted once" v-if="task.finished">{{ $t('finishedoncetask') }}</small></div>
@@ -323,7 +333,7 @@
             <small class="form-text text-muted" id="abouttext">
               {{ $t('sabout') }} {{ version }} <br> 
               {{ $t('proud') }} <br> 
-              {{ $t('sauthor') }} <a class="text-muted-icon" href="https://github.com/scris" target="_blank"><i class="fab fa-github"></i></a>&nbsp;<a class="text-muted-icon" v-if="!isonios" href="mailto:tianze@scris.top" target="_blank"><i class="fa fa-envelope"></i></a> {{ $t('sothercontributor') }} <br>
+              {{ $t('sauthor') }} <a class="text-muted-icon" href="https://github.com/scris" target="_blank"><i class="fab fa-github"></i></a>&nbsp;<a class="text-muted-icon" v-if="!isonios" href="mailto:slaaker@126.com" target="_blank"><i class="fa fa-envelope"></i></a> {{ $t('sothercontributor') }} <br>
               {{ $t('scontribute') }} <a class="text-muted-icon" href="https://github.com/scris/switchable/" target="_blank"><i class="fab fa-github"></i></a>
             </small>
           </b-col>
